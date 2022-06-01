@@ -27,6 +27,9 @@ public class ReceiveDeal : ScenarioBase
             {
                 var m = (TradeCaptureReport)msg.Message;
 
+                //  ответ на запрос, а не фоновая сделка
+                if (m.IsSetTradeRequestID()) continue;
+
                 LogTradeCaptureReport(m);
                 return;
             }

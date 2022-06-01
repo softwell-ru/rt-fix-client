@@ -24,7 +24,7 @@ public class SendQuotationsRequestReceiveSnapshots : ScenarioBase
         var count = 0;
         var totalCount = 0;
 
-        var request = Helpers.CreateQuotationRequest(new[] { "001500002000TSLA" }, null);
+        var request = Helpers.CreateQuotationRequest(new[] { "USD/RUB" }, null);
         context.Client.SendMessage(request);
 
         await foreach (var msg in context.Client.ReadAllMessagesAsync(ct))
@@ -43,11 +43,11 @@ public class SendQuotationsRequestReceiveSnapshots : ScenarioBase
 
                 if (count == totalCount)
                 {
-                    Logger.LogInformation("Все котировки получены");
+                    Logger.LogInformation("Все котировки получены: {count}", count);
                     return;
                 }
 
-                Logger.LogInformation("Осталось получить котировок: {count}", totalCount - count);
+                Logger.LogInformation("Осталось получить котировок: {count}/{totalCount}", totalCount - count, totalCount);
             }
             else if (msg.Message.Header.GetString(Tags.MsgType) == MsgType.MARKET_DATA_REQUEST_REJECT)
             {
@@ -61,7 +61,7 @@ public class SendQuotationsRequestReceiveSnapshots : ScenarioBase
     {
         var prices = new List<string>();
 
-        for (var i = 1; i < mds.NoMDEntries.getValue(); i++)
+        for (var i = 1; i <= mds.NoMDEntries.getValue(); i++)
         {
             var g = new MarketDataSnapshotFullRefresh.NoMDEntriesGroup();
             mds.GetGroup(i, g);
@@ -70,7 +70,7 @@ public class SendQuotationsRequestReceiveSnapshots : ScenarioBase
 
             g.GetGroup(1, pg);
 
-            prices.Add($"{g.MDEntryType.getValue}: {g.MDEntryPx.getValue()}, PartyId={pg.PartyID.getValue()}");
+            prices.Add($"{g.MDEntryType.getValue()}: {g.MDEntryPx.getValue()}, PartyId={pg.PartyID.getValue()}");
         }
 
         Logger.LogInformation(@"Получили котировку по инструменту {securityId}: 

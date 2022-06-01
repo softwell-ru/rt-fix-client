@@ -21,7 +21,7 @@ public class SendQuotationsRequestReceiveRefreshed : ScenarioBase
     {
         await WaitForLogonAsync(context, ct);
 
-        var request = Helpers.CreateQuotationRequest(new[] { "001500002000TSLA" }, null);
+        var request = Helpers.CreateQuotationRequest(new[] { "USD/RUB" }, null);
         context.Client.SendMessage(request);
 
         await foreach (var msg in context.Client.ReadAllMessagesAsync(ct))
@@ -31,7 +31,6 @@ public class SendQuotationsRequestReceiveRefreshed : ScenarioBase
                 var m = (MarketDataIncrementalRefresh)msg.Message;
 
                 LogMarketDataIncrementalRefresh(m);
-
                 return;
             }
             else if (msg.Message.Header.GetString(Tags.MsgType) == MsgType.MARKET_DATA_REQUEST_REJECT)
@@ -46,7 +45,7 @@ public class SendQuotationsRequestReceiveRefreshed : ScenarioBase
     {
         var msgs = new List<string>();
 
-        for (var i = 1; i < mdr.NoMDEntries.getValue(); i++)
+        for (var i = 1; i <= mdr.NoMDEntries.getValue(); i++)
         {
             var g = new MarketDataIncrementalRefresh.NoMDEntriesGroup();
             mdr.GetGroup(i, g);
@@ -55,7 +54,7 @@ public class SendQuotationsRequestReceiveRefreshed : ScenarioBase
 
             g.GetGroup(1, pg);
 
-            msgs.Add($"инструмент {g.SecurityID.getValue()} {g.MDEntryType.getValue}: {g.MDEntryPx.getValue()}, PartyId={pg.PartyID.getValue()}");
+            msgs.Add($"инструмент {g.SecurityID.getValue()} {g.MDEntryType.getValue()}: {g.MDEntryPx.getValue()}, PartyId={pg.PartyID.getValue()}");
         }
 
         Logger.LogInformation(@"Получили обновление котировок: 

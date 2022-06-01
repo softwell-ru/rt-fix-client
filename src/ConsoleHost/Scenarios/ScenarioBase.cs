@@ -58,6 +58,8 @@ public abstract class ScenarioBase : IScenario
         }
         catch (Exception ex)
         {
+            if (ct.IsCancellationRequested) return;
+
             Logger.LogInformation(ex, "Ошибка во время выполнения сценария");
             throw;
         }

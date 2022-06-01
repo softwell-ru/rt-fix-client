@@ -17,10 +17,10 @@ var builder = Host.CreateDefaultBuilder()
     {
         services.AddLogging(o => o.AddConsole());
         services.AddSingleton(scenarioSettings);
-        // services.AddSingleton<IScenario, SendQuotationsRequestReceiveSnapshots>();
+        services.AddSingleton<IScenario, SendQuotationsRequestReceiveSnapshots>();
         // services.AddSingleton<IScenario, SendQuotationsRequestReceiveRefreshed>();
         // services.AddSingleton<IScenario, ReceiveDeal>();
-        services.AddSingleton<IScenario, SendDealsRequestAndReceiveDeal>();
+        // services.AddSingleton<IScenario, SendDealsRequestAndReceiveDeal>();
 
     });
 
