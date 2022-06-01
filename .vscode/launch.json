@@ -1,0 +1,24 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "ConsoleHost",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build-console",
+            "program": "${workspaceFolder}/src/ConsoleHost/bin/Debug/net6.0/SoftWell.RtFix.ConsoleHost.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/src/ConsoleHost",
+            "console": "internalConsole",
+            "stopAtEntry": false
+        },
+        {
+            "name": ".NET Core Attach",
+            "type": "coreclr",
+            "request": "attach"
+        }
+    ]
+}
