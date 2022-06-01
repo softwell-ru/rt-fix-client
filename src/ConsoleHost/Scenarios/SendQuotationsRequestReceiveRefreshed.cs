@@ -54,7 +54,15 @@ public class SendQuotationsRequestReceiveRefreshed : ScenarioBase
 
             g.GetGroup(1, pg);
 
-            msgs.Add($"инструмент {g.SecurityID.getValue()} {g.MDEntryType.getValue()}: {g.MDEntryPx.getValue()}, PartyId={pg.PartyID.getValue()}");
+            if (g.MDUpdateAction.getValue() == MDUpdateAction.NEW)
+            {
+                msgs.Add($"инструмент {g.SecurityID.getValue()} NEW {g.MDEntryType.getValue()}: {g.MDEntryPx.getValue()}, PartyId={pg.PartyID.getValue()}");
+            }
+            else if (g.MDUpdateAction.getValue() == MDUpdateAction.DELETE)
+            {
+                msgs.Add($"инструмент {g.SecurityID.getValue()} DELETE {g.MDEntryType.getValue()}: PartyId={pg.PartyID.getValue()}");
+            }
+            else throw new InvalidOperationException("Unknown MDUpdateAction " + g.MDUpdateAction.getValue());
         }
 
         Logger.LogInformation(@"Получили обновление котировок: 
