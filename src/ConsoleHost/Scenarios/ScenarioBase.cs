@@ -17,7 +17,7 @@ public abstract class ScenarioBase : IScenario
     {
         Settings = settings ?? throw new ArgumentNullException(nameof(settings));
         _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
-        Logger = _loggerFactory.CreateLogger($"Scenario:{Name}");
+        Logger = _loggerFactory.CreateLogger(Name);
     }
 
     public ScenarioSettings Settings { get; }
