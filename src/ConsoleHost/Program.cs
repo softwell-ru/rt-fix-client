@@ -15,13 +15,14 @@ var scenarioSettings = new ScenarioSettings(
 var builder = Host.CreateDefaultBuilder()
     .ConfigureServices(services =>
     {
-        services.AddLogging(o => o.AddConsole());
+        services.AddLogging(
+            o => o.AddConsole()
+                .SetMinimumLevel(LogLevel.Trace));
         services.AddSingleton(scenarioSettings);
         services.AddSingleton<IScenario, SendQuotationsRequestReceiveSnapshots>();
         // services.AddSingleton<IScenario, SendQuotationsRequestReceiveRefreshed>();
         // services.AddSingleton<IScenario, ReceiveDeal>();
         // services.AddSingleton<IScenario, SendDealsRequestAndReceiveDeal>();
-
     });
 
 using var host = builder.Build();

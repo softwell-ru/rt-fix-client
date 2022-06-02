@@ -51,7 +51,7 @@ public class ConsoleQuickfixLogFactory : ILogFactory
 
         private void Log(string category, string message)
         {
-            _logger.LogInformation("{category}: {message}", category, message.ToFixReadable());
+            _logger.LogDebug("{category}: {message}", category, message.ToFixReadable());
         }
     }
 }

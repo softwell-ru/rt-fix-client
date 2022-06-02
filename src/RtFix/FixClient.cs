@@ -37,36 +37,36 @@ public class FixClient : IApplication, IAsyncDisposable
             && message.GetString(Tags.Text).StartsWith("MsgSeqNum too low"))
         {
             var seqno = message.Header.GetInt(Tags.MsgSeqNum);
-            _logger.LogInformation("Сбрасываем seqno для {session}: {seqno}", sessionID, seqno);
+            _logger.LogDebug("Сбрасываем seqno для {session}: {seqno}", sessionID, seqno);
             _session.NextSenderMsgSeqNum = seqno;
             _session.NextTargetMsgSeqNum = seqno;
             return;
         }
 
-        _logger.LogInformation("FROMADMIN: {session}, {message}", sessionID, message.ToLog());
+        _logger.LogDebug("FROMADMIN: {session}, {message}", sessionID, message.ToLog());
         _channel.Writer.TryWrite(new MessageWrapper(message, sessionID, DateTime.Now));
     }
 
     public void FromApp(Message message, SessionID sessionID)
     {
-        _logger.LogInformation("FROMAPP: {session}, {message}", sessionID, message.ToLog());
+        _logger.LogDebug("FROMAPP: {session}, {message}", sessionID, message.ToLog());
         _channel.Writer.TryWrite(new MessageWrapper(message, sessionID, DateTime.Now));
     }
 
     public void OnCreate(SessionID sessionID)
     {
         _session = Session.LookupSession(sessionID);
-        _logger.LogInformation("Создана сессия: {session}", sessionID);
+        _logger.LogDebug("Создана сессия: {session}", sessionID);
     }
 
     public void OnLogon(SessionID sessionID)
     {
-        _logger.LogInformation("LOGON: {session}", sessionID);
+        _logger.LogDebug("LOGON: {session}", sessionID);
     }
 
     public void OnLogout(SessionID sessionID)
     {
-        _logger.LogInformation("LOGOUT: {session}", sessionID);
+        _logger.LogDebug("LOGOUT: {session}", sessionID);
     }
 
     public void ToAdmin(Message message, SessionID sessionID)
@@ -86,7 +86,7 @@ public class FixClient : IApplication, IAsyncDisposable
             }
         }
 
-        _logger.LogInformation("TOADMIN: {session}, {message}", sessionID, message.ToLog());
+        _logger.LogDebug("TOADMIN: {session}, {message}", sessionID, message.ToLog());
     }
 
     public void ToApp(Message message, SessionID sessionID)
@@ -105,7 +105,7 @@ public class FixClient : IApplication, IAsyncDisposable
         catch (FieldNotFoundException)
         { }
 
-        _logger.LogInformation("TOAPP: {session}, {message}", sessionID, message.ToLog());
+        _logger.LogDebug("TOAPP: {session}, {message}", sessionID, message.ToLog());
     }
 
     public void SendMessage(Message m)
