@@ -17,16 +17,16 @@ public abstract class ScenarioBase : IScenario
     {
         Settings = settings ?? throw new ArgumentNullException(nameof(settings));
         _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
-        Logger = _loggerFactory.CreateLogger(Name);
+        Logger = _loggerFactory.CreateLogger(GetType());
     }
 
     public ScenarioSettings Settings { get; }
 
+    public abstract string Name { get; }
+
+    public virtual string? Description { get; }
+
     protected ILogger Logger { get; }
-
-    protected abstract string Name { get; }
-
-    protected virtual string? Description { get; }
 
     public async Task RunAsync(CancellationToken ct = default)
     {
@@ -52,6 +52,10 @@ public abstract class ScenarioBase : IScenario
 
             initiator.Start();
 
+            await WaitForLogonAsync(context, ct);
+
+            Logger.LogInformation("Подключились к серверу");
+
             await RunAsyncInner(context, ct);
 
             initiator.Stop();
@@ -60,7 +64,7 @@ public abstract class ScenarioBase : IScenario
         {
             if (ct.IsCancellationRequested) return;
 
-            Logger.LogInformation(ex, "Ошибка во время выполнения сценария");
+            Logger.LogError(ex, "Ошибка во время выполнения сценария");
             throw;
         }
         finally
@@ -84,7 +88,7 @@ public abstract class ScenarioBase : IScenario
     {
         await foreach (var msg in context.Client.ReadAllMessagesAsync(ct))
         {
-            if (msg.Message.Header.GetString(Tags.MsgType) == msgType)
+            if (msg.Message.IsOfType(msgType))
             {
                 return msg;
             }

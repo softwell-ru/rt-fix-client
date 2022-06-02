@@ -13,33 +13,31 @@ public class SendQuotationsRequestReceiveSnapshots : ScenarioBase
     {
     }
 
-    protected override string Name => nameof(SendQuotationsRequestReceiveSnapshots);
+    public override string Name => nameof(SendQuotationsRequestReceiveSnapshots);
 
-    protected override string? Description => "Отправить запрос на котировки, получить текущие значения";
+    public override string? Description => "Отправить запрос на котировки, получить текущие значения";
 
     protected override async Task RunAsyncInner(ScenarioContext context, CancellationToken ct)
     {
-        await WaitForLogonAsync(context, ct);
-
         var count = 0;
         var totalCount = 0;
 
         var request = Helpers.CreateQuotationRequest(new[] { "USD/RUB" }, null);
         context.Client.SendMessage(request);
 
+        Logger.LogInformation("Отправили запрос на котировки, ожидаем текущее значение котировок..");
+
         await foreach (var msg in context.Client.ReadAllMessagesAsync(ct))
         {
-            if (msg.Message.Header.GetString(Tags.MsgType) == MsgType.MARKET_DATA_SNAPSHOT_FULL_REFRESH)
+            if (msg.Message.IsOfType<MarketDataSnapshotFullRefresh>(MsgType.MARKET_DATA_SNAPSHOT_FULL_REFRESH, out var mdfr))
             {
-                var m = (MarketDataSnapshotFullRefresh)msg.Message;
-
                 if (count == 0)
                 {
-                    totalCount = m.TotNumReports.getValue();
+                    totalCount = mdfr.TotNumReports.getValue();
                 }
                 count++;
 
-                LogMarketDataSnapshotFullRefresh(m);
+                LogMarketDataSnapshotFullRefresh(mdfr);
 
                 if (count == totalCount)
                 {
@@ -49,10 +47,9 @@ public class SendQuotationsRequestReceiveSnapshots : ScenarioBase
 
                 Logger.LogInformation("Осталось получить котировок: {count}/{totalCount}", totalCount - count, totalCount);
             }
-            else if (msg.Message.Header.GetString(Tags.MsgType) == MsgType.MARKET_DATA_REQUEST_REJECT)
+            else if (msg.Message.IsOfType<MarketDataRequestReject>(MsgType.MARKET_DATA_REQUEST_REJECT, out var mdrr))
             {
-                var m = (MarketDataRequestReject)msg.Message;
-                throw new Exception("Запрос на получение котировок был отклонен с причиной " + m.MDReqRejReason.getValue());
+                throw new Exception("Запрос на получение котировок был отклонен с причиной " + mdrr.MDReqRejReason.getValue());
             }
         }
     }

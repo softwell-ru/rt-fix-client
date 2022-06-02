@@ -12,17 +12,25 @@ var settingsPath = existsLocal ? "SessionSettings.local.cfg" : "SessionSettings.
 var scenarioSettings = new ScenarioSettings(
     new SessionSettings(settingsPath));
 
+void AddScenario<TScenario>(IServiceCollection services) where TScenario : class, IScenario
+{
+    if (args.Length > 0 && !args.Contains(typeof(TScenario).Name, StringComparer.OrdinalIgnoreCase)) return;
+
+    services.AddSingleton<IScenario, TScenario>();
+}
+
 var builder = Host.CreateDefaultBuilder()
     .ConfigureServices(services =>
     {
         services.AddLogging(
             o => o.AddConsole()
                 .SetMinimumLevel(LogLevel.Trace));
+
         services.AddSingleton(scenarioSettings);
-        services.AddSingleton<IScenario, SendQuotationsRequestReceiveSnapshots>();
-        // services.AddSingleton<IScenario, SendQuotationsRequestReceiveRefreshed>();
-        // services.AddSingleton<IScenario, ReceiveDeal>();
-        // services.AddSingleton<IScenario, SendDealsRequestAndReceiveDeal>();
+        AddScenario<SendQuotationsRequestReceiveSnapshots>(services);
+        AddScenario<SendQuotationsRequestReceiveRefreshed>(services);
+        AddScenario<ReceiveDeal>(services);
+        AddScenario<SendDealsRequestAndReceiveDeals>(services);
     });
 
 using var host = builder.Build();
@@ -42,7 +50,7 @@ try
 
     var scenarios = host.Services.GetRequiredService<IEnumerable<IScenario>>().ToList();
 
-    logger.LogInformation("Количество тестовых сценариев: {count}", scenarios.Count);
+    logger.LogInformation("Тестовые сценарии: {scenarioNames}", string.Join(", ", scenarios.Select(x => x.Name)));
 
     var errorCount = 0;
 

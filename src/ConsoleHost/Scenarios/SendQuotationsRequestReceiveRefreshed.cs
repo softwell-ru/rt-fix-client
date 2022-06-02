@@ -13,30 +13,27 @@ public class SendQuotationsRequestReceiveRefreshed : ScenarioBase
     {
     }
 
-    protected override string Name => nameof(SendQuotationsRequestReceiveRefreshed);
+    public override string Name => nameof(SendQuotationsRequestReceiveRefreshed);
 
-    protected override string? Description => "Отправить запрос на котировки, получить обновление";
+    public override string? Description => "Отправить запрос на котировки, получить обновление";
 
     protected override async Task RunAsyncInner(ScenarioContext context, CancellationToken ct)
     {
-        await WaitForLogonAsync(context, ct);
-
         var request = Helpers.CreateQuotationRequest(new[] { "USD/RUB" }, null);
         context.Client.SendMessage(request);
 
+        Logger.LogInformation("Отправили запрос на котировки, ожидаем хотя бы одно обновление котировки..");
+
         await foreach (var msg in context.Client.ReadAllMessagesAsync(ct))
         {
-            if (msg.Message.Header.GetString(Tags.MsgType) == MsgType.MARKET_DATA_INCREMENTAL_REFRESH)
+            if (msg.Message.IsOfType<MarketDataIncrementalRefresh>(MsgType.MARKET_DATA_INCREMENTAL_REFRESH, out var mdir))
             {
-                var m = (MarketDataIncrementalRefresh)msg.Message;
-
-                LogMarketDataIncrementalRefresh(m);
+                LogMarketDataIncrementalRefresh(mdir);
                 return;
             }
-            else if (msg.Message.Header.GetString(Tags.MsgType) == MsgType.MARKET_DATA_REQUEST_REJECT)
+            else if (msg.Message.IsOfType<MarketDataRequestReject>(MsgType.MARKET_DATA_REQUEST_REJECT, out var mdrr))
             {
-                var m = (MarketDataRequestReject)msg.Message;
-                throw new Exception("Запрос на получение котировок был отклонен с причиной " + m.MDReqRejReason.getValue());
+                throw new Exception("Запрос на получение котировок был отклонен с причиной " + mdrr.MDReqRejReason.getValue());
             }
         }
     }

@@ -5,41 +5,39 @@ using SoftWell.RtFix.ConsoleHost.Scenarios.Infrastructure;
 
 namespace SoftWell.RtFix.ConsoleHost.Scenarios;
 
-public class SendDealsRequestAndReceiveDeal : ScenarioBase
+public class SendDealsRequestAndReceiveDeals : ScenarioBase
 {
-    public SendDealsRequestAndReceiveDeal(
+    public SendDealsRequestAndReceiveDeals(
         ScenarioSettings settings,
         ILoggerFactory loggerFactory) : base(settings, loggerFactory)
     {
     }
 
-    protected override string Name => nameof(SendDealsRequestAndReceiveDeal);
+    public override string Name => nameof(SendDealsRequestAndReceiveDeals);
 
-    protected override string? Description => "Отправить запрос на сделки за последние 10 дней, получить подтверждение запроса, получить сделки, если есть";
+    public override string? Description => "Отправить запрос на сделки за последние 10 дней, получить подтверждение запроса, получить сделки, если есть";
 
     protected override async Task RunAsyncInner(ScenarioContext context, CancellationToken ct)
     {
-        await WaitForLogonAsync(context, ct);
-
-        var request = Helpers.CreateDealsReportRequest(DateTime.Now.AddDays(-10), null);
+        var request = Helpers.CreateDealsReportRequest(DateTime.Now.AddDays(-1), null);
 
         context.Client.SendMessage(request);
+
+        Logger.LogInformation("Отправили запрос на получение сделок, ожидаем результат..");
 
         var count = 0;
 
         await foreach (var msg in context.Client.ReadAllMessagesAsync(ct))
         {
-            if (msg.Message.Header.GetString(Tags.MsgType) == MsgType.TRADE_CAPTURE_REPORT_REQUEST_ACK)
+            if (msg.Message.IsOfType<TradeCaptureReportRequestAck>(MsgType.TRADE_CAPTURE_REPORT_REQUEST_ACK, out var tcra))
             {
-                var m = (TradeCaptureReportRequestAck)msg.Message;
+                if (tcra.TradeRequestID.getValue() != request.TradeRequestID.getValue()) continue;
 
-                if (m.TradeRequestID.getValue() != request.TradeRequestID.getValue()) continue;
-
-                var status = m.TradeRequestStatus.getValue();
+                var status = tcra.TradeRequestStatus.getValue();
 
                 if (status == TradeRequestStatus.REJECTED)
                 {
-                    throw new Exception("Пришел отказ на получение сделок с причиной: " + m.TradeRequestResult.getValue());
+                    throw new Exception("Пришел отказ на получение сделок с причиной: " + tcra.TradeRequestResult.getValue());
                 }
 
                 if (status == TradeRequestStatus.COMPLETED)
@@ -48,15 +46,13 @@ public class SendDealsRequestAndReceiveDeal : ScenarioBase
                     return;
                 }
 
-                throw new Exception($"Пришло подтверждение на получение сделок с неизвестным статусом: {status} и результатом {m.TradeRequestResult.getValue()}");
+                throw new Exception($"Пришло подтверждение на получение сделок с неизвестным статусом: {status} и результатом {tcra.TradeRequestResult.getValue()}");
             }
-            else if (msg.Message.Header.GetString(Tags.MsgType) == MsgType.TRADE_CAPTURE_REPORT)
+            else if (msg.Message.IsOfType<TradeCaptureReport>(MsgType.TRADE_CAPTURE_REPORT, out var tcr))
             {
-                var m = (TradeCaptureReport)msg.Message;
+                if (tcr.TradeRequestID.getValue() != request.TradeRequestID.getValue()) continue;
 
-                if (m.TradeRequestID.getValue() != request.TradeRequestID.getValue()) continue;
-
-                LogTradeCaptureReport(m);
+                LogTradeCaptureReport(tcr);
                 count++;
             }
         }

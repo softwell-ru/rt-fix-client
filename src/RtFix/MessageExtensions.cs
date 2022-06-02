@@ -1,3 +1,6 @@
+using System.Diagnostics.CodeAnalysis;
+using QuickFix.Fields;
+
 namespace SoftWell.RtFix;
 
 public static class Extensions
@@ -14,5 +17,31 @@ public static class Extensions
         ArgumentNullException.ThrowIfNull(str);
 
         return str.Replace('\u0001', '☺');
+    }
+
+    public static bool IsOfType<TMessage>(
+        this QuickFix.Message message,
+        string msgType,
+        [NotNullWhen(true)] out TMessage? typedMessage)
+            where TMessage : QuickFix.Message
+    {
+        if (!message.IsOfType(msgType))
+        {
+            typedMessage = null;
+            return false;
+        }
+
+        typedMessage = (TMessage)message;
+        return true;
+    }
+
+    public static bool IsOfType(
+        this QuickFix.Message message,
+        string msgType)
+    {
+        ArgumentNullException.ThrowIfNull(message);
+        ArgumentNullException.ThrowIfNull(msgType);
+
+        return message.Header.GetString(Tags.MsgType) == msgType;
     }
 }

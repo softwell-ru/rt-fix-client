@@ -13,24 +13,22 @@ public class ReceiveDeal : ScenarioBase
     {
     }
 
-    protected override string Name => "Получить сделку";
+    public override string Name => nameof(ReceiveDeal);
 
-    protected override string? Description => "Получить одну сделку в фоновом режиме";
+    public override string? Description => "Получить одну сделку в фоновом режиме";
 
     protected override async Task RunAsyncInner(ScenarioContext context, CancellationToken ct)
     {
-        await WaitForLogonAsync(context, ct);
+        Logger.LogInformation("Ожидаем хотя бы одну сделку");
 
         await foreach (var msg in context.Client.ReadAllMessagesAsync(ct))
         {
-            if (msg.Message.Header.GetString(Tags.MsgType) == MsgType.TRADE_CAPTURE_REPORT)
+            if (msg.Message.IsOfType<TradeCaptureReport>(MsgType.TRADE_CAPTURE_REPORT, out var tcr))
             {
-                var m = (TradeCaptureReport)msg.Message;
-
                 //  ответ на запрос, а не фоновая сделка
-                if (m.IsSetTradeRequestID()) continue;
+                if (tcr.IsSetTradeRequestID()) continue;
 
-                LogTradeCaptureReport(m);
+                LogTradeCaptureReport(tcr);
                 return;
             }
         }
