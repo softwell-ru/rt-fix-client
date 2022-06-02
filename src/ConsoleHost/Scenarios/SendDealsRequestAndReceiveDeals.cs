@@ -15,7 +15,7 @@ public class SendDealsRequestAndReceiveDeals : ScenarioBase
 
     public override string Name => nameof(SendDealsRequestAndReceiveDeals);
 
-    public override string? Description => "Отправить запрос на сделки за последние 10 дней, получить подтверждение запроса, получить сделки, если есть";
+    public override string? Description => "Отправить запрос на сделки за последние 10 дней, получить подтверждение запроса, получить сделки";
 
     protected override async Task RunAsyncInner(ScenarioContext context, CancellationToken ct)
     {
@@ -42,7 +42,15 @@ public class SendDealsRequestAndReceiveDeals : ScenarioBase
 
                 if (status == TradeRequestStatus.COMPLETED)
                 {
-                    Logger.LogInformation("Отправка сделок сервером завершена. Получено сделок: {count}", count);
+                    if (count > 0)
+                    {
+                        Logger.LogWarning("Отправка сделок сервером завершена, но сделок от сервера не пришло");
+                    }
+                    else
+                    {
+                        Logger.LogInformation("Отправка сделок сервером завершена. Получено сделок: {count}", count);
+                    }
+
                     return;
                 }
 
