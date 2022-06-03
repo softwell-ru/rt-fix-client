@@ -66,7 +66,10 @@ try
         }
     }
 
-    logger.LogInformation("Успешно выполнено сценариев: {successCount}/{totalCount}", scenarios.Count - errorCount, scenarios.Count);
+    if (!cts.IsCancellationRequested)
+    {
+        logger.LogInformation("Успешно выполнено сценариев: {successCount}/{totalCount}", scenarios.Count - errorCount, scenarios.Count);
+    }
 
     if (errorCount > 0) return 1;
 }
