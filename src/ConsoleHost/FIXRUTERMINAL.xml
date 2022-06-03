@@ -5343,6 +5343,6 @@
     <field number='1620' name='RiskEncodedSecurityDescLen' type='LENGTH' />
     <field number='1621' name='RiskEncodedSecurityDesc' type='DATA' />
     <field number='322' name='SecurityResponseID' type='STRING' />
-
+    <field number='11001' name='RTProduct' type='STRING' />
   </fields>
 </fix>
