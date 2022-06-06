@@ -24,7 +24,7 @@ var builder = Host.CreateDefaultBuilder()
     {
         services.AddLogging(
             o => o.AddConsole()
-                .SetMinimumLevel(LogLevel.Trace));
+                .SetMinimumLevel(LogLevel.Debug));
 
         services.AddSingleton(scenarioSettings);
         AddScenario<SendQuotationsRequestReceiveSnapshots>(services);

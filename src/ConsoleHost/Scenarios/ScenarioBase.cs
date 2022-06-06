@@ -2,7 +2,6 @@ using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using QuickFix;
 using QuickFix.Fields;
-using SoftWell.RtFix.ConsoleHost.FixInfrastructure;
 using SoftWell.RtFix.ConsoleHost.Scenarios.Infrastructure;
 
 namespace SoftWell.RtFix.ConsoleHost.Scenarios;
@@ -43,7 +42,7 @@ public abstract class ScenarioBase : IScenario
             await using var client = new FixClient(Settings.SessionSettings, _loggerFactory.CreateLogger<FixClient>());
 
             var storeFactory = new FileStoreFactory(Settings.SessionSettings);
-            var logFactory = new ConsoleQuickfixLogFactory(_loggerFactory);
+            var logFactory = new FileLogFactory(Settings.SessionSettings);
 
             using var initiator = new QuickFix.Transport.SocketInitiator(client, storeFactory, Settings.SessionSettings, logFactory);
             using var ctr = ct.Register(() => initiator.Stop());
@@ -57,6 +56,10 @@ public abstract class ScenarioBase : IScenario
             Logger.LogInformation("Подключились к серверу");
 
             await RunAsyncInner(context, ct);
+
+            context.Client.Logout();
+
+            await WaitForLogoutAsync(context, ct);
 
             initiator.Stop();
         }
@@ -79,6 +82,11 @@ public abstract class ScenarioBase : IScenario
     protected static Task WaitForLogonAsync(ScenarioContext context, CancellationToken ct)
     {
         return WaitForMessageAsync(context, MsgType.LOGON, ct);
+    }
+
+    protected static Task WaitForLogoutAsync(ScenarioContext context, CancellationToken ct)
+    {
+        return WaitForMessageAsync(context, MsgType.LOGOUT, ct);
     }
 
     protected static async Task<MessageWrapper> WaitForMessageAsync(

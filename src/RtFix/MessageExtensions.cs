@@ -16,7 +16,7 @@ public static class Extensions
     {
         ArgumentNullException.ThrowIfNull(str);
 
-        return str.Replace('\u0001', '☺');
+        return str.Replace('\u0001', '|');
     }
 
     public static bool IsOfType<TMessage>(

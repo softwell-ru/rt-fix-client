@@ -32,41 +32,30 @@ public class FixClient : IApplication, IAsyncDisposable
 
     public void FromAdmin(Message message, SessionID sessionID)
     {
-        if (message.Header.GetString(Tags.MsgType) == MsgType.LOGOUT
-            && message.IsSetField(Tags.Text)
-            && message.GetString(Tags.Text).StartsWith("MsgSeqNum too low"))
-        {
-            var seqno = message.Header.GetInt(Tags.MsgSeqNum);
-            _logger.LogDebug("Сбрасываем seqno для {session}: {seqno}", sessionID, seqno);
-            _session.NextSenderMsgSeqNum = seqno;
-            _session.NextTargetMsgSeqNum = seqno;
-            return;
-        }
-
-        _logger.LogDebug("FROMADMIN: {session}, {message}", sessionID, message.ToLog());
+        _logger.LogTrace("FROMADMIN: {session}, {message}", sessionID, message.ToLog());
         _channel.Writer.TryWrite(new MessageWrapper(message, sessionID, DateTime.Now));
     }
 
     public void FromApp(Message message, SessionID sessionID)
     {
-        _logger.LogDebug("FROMAPP: {session}, {message}", sessionID, message.ToLog());
+        _logger.LogTrace("FROMAPP: {session}, {message}", sessionID, message.ToLog());
         _channel.Writer.TryWrite(new MessageWrapper(message, sessionID, DateTime.Now));
     }
 
     public void OnCreate(SessionID sessionID)
     {
         _session = Session.LookupSession(sessionID);
-        _logger.LogDebug("Создана сессия: {session}", sessionID);
+        _logger.LogTrace("Создана сессия: {session}", sessionID);
     }
 
     public void OnLogon(SessionID sessionID)
     {
-        _logger.LogDebug("LOGON: {session}", sessionID);
+        _logger.LogTrace("LOGON: {session}", sessionID);
     }
 
     public void OnLogout(SessionID sessionID)
     {
-        _logger.LogDebug("LOGOUT: {session}", sessionID);
+        _logger.LogTrace("LOGOUT: {session}", sessionID);
     }
 
     public void ToAdmin(Message message, SessionID sessionID)
@@ -86,7 +75,7 @@ public class FixClient : IApplication, IAsyncDisposable
             }
         }
 
-        _logger.LogDebug("TOADMIN: {session}, {message}", sessionID, message.ToLog());
+        _logger.LogTrace("TOADMIN: {session}, {message}", sessionID, message.ToLog());
     }
 
     public void ToApp(Message message, SessionID sessionID)
@@ -105,7 +94,7 @@ public class FixClient : IApplication, IAsyncDisposable
         catch (FieldNotFoundException)
         { }
 
-        _logger.LogDebug("TOAPP: {session}, {message}", sessionID, message.ToLog());
+        _logger.LogTrace("TOAPP: {session}, {message}", sessionID, message.ToLog());
     }
 
     public void SendMessage(Message m)
@@ -113,6 +102,13 @@ public class FixClient : IApplication, IAsyncDisposable
         if (_session == null) throw new InvalidOperationException("Отсутствует сессия");
 
         _session.Send(m);
+    }
+
+    public void Logout()
+    {
+        if (_session == null) throw new InvalidOperationException("Отсутствует сессия");
+
+        _session.Logout();
     }
 
     public IAsyncEnumerable<MessageWrapper> ReadAllMessagesAsync(CancellationToken ct = default)
