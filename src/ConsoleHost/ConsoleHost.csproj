@@ -24,7 +24,7 @@
     <None Include="FIXT11.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="FIXRUTERMINAL.xml">
+    <None Include="FIXRTv1.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="SessionSettings.cfg">
