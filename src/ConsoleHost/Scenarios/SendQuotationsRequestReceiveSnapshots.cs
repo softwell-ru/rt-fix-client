@@ -22,7 +22,7 @@ public class SendQuotationsRequestReceiveSnapshots : ScenarioBase
         var count = 0;
         var totalCount = 0;
 
-        var request = Helpers.CreateQuotationRequest(new[] { "USD/RUB" }, null);
+        var request = Helpers.CreateQuotationRequest(new[] { "FX-USD-RUB-TOM" }, null);
         context.Client.SendMessage(request);
 
         Logger.LogInformation("Отправили запрос на котировки, ожидаем текущее значение котировок..");

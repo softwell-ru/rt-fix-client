@@ -19,7 +19,7 @@ public class SendQuotationsRequestReceiveRefreshed : ScenarioBase
 
     protected override async Task RunAsyncInner(ScenarioContext context, CancellationToken ct)
     {
-        var request = Helpers.CreateQuotationRequest(new[] { "USD/RUB" }, null);
+        var request = Helpers.CreateQuotationRequest(new[] { "FX-USD-RUB-TOM" }, null);
         context.Client.SendMessage(request);
 
         Logger.LogInformation("Отправили запрос на котировки, ожидаем хотя бы одно обновление котировки..");
