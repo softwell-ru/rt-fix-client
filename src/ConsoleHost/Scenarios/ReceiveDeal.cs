@@ -23,7 +23,7 @@ public class ReceiveDeal : ScenarioBase
 
         await foreach (var msg in context.Client.ReadAllMessagesAsync(ct))
         {
-            if (msg.Message.IsOfType<TradeCaptureReport>(MsgType.TRADE_CAPTURE_REPORT, out var tcr))
+            if (msg.IsOfType<TradeCaptureReport>(MsgType.TRADE_CAPTURE_REPORT, out var tcr))
             {
                 //  ответ на запрос, а не фоновая сделка
                 if (tcr.IsSetTradeRequestID()) continue;

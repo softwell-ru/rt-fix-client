@@ -29,7 +29,7 @@ public class SendDealsRequestAndReceiveDeals : ScenarioBase
 
         await foreach (var msg in context.Client.ReadAllMessagesAsync(ct))
         {
-            if (msg.Message.IsOfType<TradeCaptureReportRequestAck>(MsgType.TRADE_CAPTURE_REPORT_REQUEST_ACK, out var tcra))
+            if (msg.IsOfType<TradeCaptureReportRequestAck>(MsgType.TRADE_CAPTURE_REPORT_REQUEST_ACK, out var tcra))
             {
                 if (tcra.TradeRequestID.getValue() != request.TradeRequestID.getValue()) continue;
 
@@ -56,7 +56,7 @@ public class SendDealsRequestAndReceiveDeals : ScenarioBase
 
                 throw new Exception($"Пришло подтверждение на получение сделок с неизвестным статусом: {status} и результатом {tcra.TradeRequestResult.getValue()}");
             }
-            else if (msg.Message.IsOfType<TradeCaptureReport>(MsgType.TRADE_CAPTURE_REPORT, out var tcr))
+            else if (msg.IsOfType<TradeCaptureReport>(MsgType.TRADE_CAPTURE_REPORT, out var tcr))
             {
                 if (tcr.TradeRequestID.getValue() != request.TradeRequestID.getValue()) continue;
 

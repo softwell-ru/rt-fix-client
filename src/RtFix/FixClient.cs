@@ -9,7 +9,7 @@ public class FixClient : IApplication, IAsyncDisposable
 {
     private readonly SessionSettings _sessionSettings;
 
-    private readonly Channel<MessageWrapper> _channel;
+    private readonly Channel<Message> _channel;
 
     private readonly ILogger _logger;
 
@@ -22,7 +22,7 @@ public class FixClient : IApplication, IAsyncDisposable
         _sessionSettings = sessionSettings ?? throw new ArgumentNullException(nameof(sessionSettings));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-        _channel = Channel.CreateUnbounded<MessageWrapper>(new UnboundedChannelOptions
+        _channel = Channel.CreateUnbounded<Message>(new UnboundedChannelOptions
         {
             AllowSynchronousContinuations = true,
             SingleReader = true,
@@ -33,13 +33,13 @@ public class FixClient : IApplication, IAsyncDisposable
     public void FromAdmin(Message message, SessionID sessionID)
     {
         _logger.LogTrace("FROMADMIN: {session}, {message}", sessionID, message.ToLog());
-        _channel.Writer.TryWrite(new MessageWrapper(message, sessionID, DateTime.Now));
+        _channel.Writer.TryWrite(message);
     }
 
     public void FromApp(Message message, SessionID sessionID)
     {
         _logger.LogTrace("FROMAPP: {session}, {message}", sessionID, message.ToLog());
-        _channel.Writer.TryWrite(new MessageWrapper(message, sessionID, DateTime.Now));
+        _channel.Writer.TryWrite(message);
     }
 
     public void OnCreate(SessionID sessionID)
@@ -111,7 +111,7 @@ public class FixClient : IApplication, IAsyncDisposable
         _session.Logout();
     }
 
-    public IAsyncEnumerable<MessageWrapper> ReadAllMessagesAsync(CancellationToken ct = default)
+    public IAsyncEnumerable<Message> ReadAllMessagesAsync(CancellationToken ct = default)
     {
         return _channel.Reader.ReadAllAsync(ct);
     }

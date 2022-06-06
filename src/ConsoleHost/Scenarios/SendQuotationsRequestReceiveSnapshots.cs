@@ -29,7 +29,7 @@ public class SendQuotationsRequestReceiveSnapshots : ScenarioBase
 
         await foreach (var msg in context.Client.ReadAllMessagesAsync(ct))
         {
-            if (msg.Message.IsOfType<MarketDataSnapshotFullRefresh>(MsgType.MARKET_DATA_SNAPSHOT_FULL_REFRESH, out var mdfr))
+            if (msg.IsOfType<MarketDataSnapshotFullRefresh>(MsgType.MARKET_DATA_SNAPSHOT_FULL_REFRESH, out var mdfr))
             {
                 if (count == 0)
                 {
@@ -47,7 +47,7 @@ public class SendQuotationsRequestReceiveSnapshots : ScenarioBase
 
                 Logger.LogInformation("Осталось получить котировок: {count}/{totalCount}", totalCount - count, totalCount);
             }
-            else if (msg.Message.IsOfType<MarketDataRequestReject>(MsgType.MARKET_DATA_REQUEST_REJECT, out var mdrr))
+            else if (msg.IsOfType<MarketDataRequestReject>(MsgType.MARKET_DATA_REQUEST_REJECT, out var mdrr))
             {
                 throw new Exception("Запрос на получение котировок был отклонен с причиной " + mdrr.MDReqRejReason.getValue());
             }

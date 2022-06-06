@@ -89,14 +89,14 @@ public abstract class ScenarioBase : IScenario
         return WaitForMessageAsync(context, MsgType.LOGOUT, ct);
     }
 
-    protected static async Task<MessageWrapper> WaitForMessageAsync(
+    protected static async Task<Message> WaitForMessageAsync(
         ScenarioContext context,
         string msgType,
         CancellationToken ct)
     {
         await foreach (var msg in context.Client.ReadAllMessagesAsync(ct))
         {
-            if (msg.Message.IsOfType(msgType))
+            if (msg.IsOfType(msgType))
             {
                 return msg;
             }

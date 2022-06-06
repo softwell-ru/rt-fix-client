@@ -26,12 +26,12 @@ public class SendQuotationsRequestReceiveRefreshed : ScenarioBase
 
         await foreach (var msg in context.Client.ReadAllMessagesAsync(ct))
         {
-            if (msg.Message.IsOfType<MarketDataIncrementalRefresh>(MsgType.MARKET_DATA_INCREMENTAL_REFRESH, out var mdir))
+            if (msg.IsOfType<MarketDataIncrementalRefresh>(MsgType.MARKET_DATA_INCREMENTAL_REFRESH, out var mdir))
             {
                 LogMarketDataIncrementalRefresh(mdir);
                 return;
             }
-            else if (msg.Message.IsOfType<MarketDataRequestReject>(MsgType.MARKET_DATA_REQUEST_REJECT, out var mdrr))
+            else if (msg.IsOfType<MarketDataRequestReject>(MsgType.MARKET_DATA_REQUEST_REJECT, out var mdrr))
             {
                 throw new Exception("Запрос на получение котировок был отклонен с причиной " + mdrr.MDReqRejReason.getValue());
             }
