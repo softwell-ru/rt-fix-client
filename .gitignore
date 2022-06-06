@@ -1,0 +1,56 @@
+###############################################################################
+# Visual Studio artifacts
+
+.vs/
+*.user
+*.suo
+*.jfm
+*.dbml
+
+###############################################################################
+# ReSharper artifacts
+
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+###############################################################################
+# DotCover artifacts
+
+*.dotCover
+
+###############################################################################
+# NuGet artifacts
+
+*.nupkg
+# The packages folder can be ignored because of Package Restore
+**/packages/*
+# except build/, which is used as an MSBuild target.
+!**/packages/build/
+# Uncomment if necessary however generally it will be regenerated when needed
+#!**/packages/repositories.config
+# NuGet v3's project.json files produces more ignoreable files
+*.nuget.props
+*.nuget.targets
+nuget_publish.log
+
+###############################################################################
+# MSTest artifacts
+
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+
+###############################################################################
+# Build artifacts
+
+[Bb]in/
+[Oo]bj/
+
+###############################################################################
+# Logs
+
+[Ll]og/
+[Ll]ogs/
+*.log
+store/
+SessionSettings.local.cfg
