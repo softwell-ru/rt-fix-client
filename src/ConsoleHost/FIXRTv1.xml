@@ -54,6 +54,7 @@
       <field name='LastRptRequested' required='N' />
       <field name='UnsolicitedIndicator' required='N' />
       <field name='PriceType' required='N' />
+      <field name='RT_PRODUCT' required='N' />
       <component name='Instrument' required='N' />
       <field name='QtyType' required='N' />
       <field name='LastQty' required='N' />
@@ -731,13 +732,6 @@
     <field number='1406' name='RefApplExtID' type='INT' />
     <field number='1410' name='DefaultVerIndicator' type='BOOLEAN' />
     <field number='1500' name='MDStreamID' type='STRING' />
-    <field number='11001' name='RT_PRODUCT' type='STRING'>
-      <value enum='1' description='FX' />
-      <value enum='2' description='FX_SWAP' />
-      <value enum='3' description='DEPOSIT_FIXED' />
-      <value enum='4' description='DEPOSIT_FLOAT' />
-      <value enum='5' description='REPO_FIXED' />
-      <value enum='5' description='REPO_FLOAT' />
-    </field>
+    <field number='11001' name='RT_PRODUCT' type='STRING' />
   </fields>
 </fix>
