@@ -1,0 +1,12 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <Company>SoftWell</Company>
+        <Authors>$(Company)</Authors>
+        <Owners>$(Company)</Owners>
+        <Copyright>Copyright (c) SoftWell 1996-$([System.DateTime]::Now.ToString(yyyy))</Copyright>
+        <RepositoryUrl>https://github.com/softwell-ru/rt-fix-client</RepositoryUrl>
+        <Nullable>enable</Nullable>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <Version>1.0.1</Version>
+    </PropertyGroup>
+</Project>

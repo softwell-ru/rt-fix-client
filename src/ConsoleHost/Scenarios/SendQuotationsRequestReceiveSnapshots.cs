@@ -51,6 +51,14 @@ public class SendQuotationsRequestReceiveSnapshots : ScenarioBase
             {
                 throw new Exception("Запрос на получение котировок был отклонен с причиной " + mdrr.MDReqRejReason.getValue());
             }
+            else if (
+                msg.IsOfType<BusinessMessageReject>(MsgType.BUSINESS_MESSAGE_REJECT, out var bmr)
+                && bmr.RefMsgType.getValue() == MsgType.MARKET_DATA_REQUEST
+                && bmr.IsSetBusinessRejectRefID()
+                && bmr.BusinessRejectRefID.getValue() == request.MDReqID.getValue())
+            {
+                throw new Exception($"Запрос отклонен с причиной {bmr.BusinessRejectReason.getValue()}: {bmr.Text.getValue()}");
+            }
         }
     }
 
