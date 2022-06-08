@@ -53,4 +53,5 @@ nuget_publish.log
 [Ll]ogs/
 *.log
 store/
+publish/
 SessionSettings.local.cfg
