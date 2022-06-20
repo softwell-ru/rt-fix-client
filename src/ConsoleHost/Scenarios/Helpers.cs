@@ -91,4 +91,32 @@ public static class Helpers
 
         return msg;
     }
+
+    public static Quote CreateQuote(
+        string securityId,
+        decimal? bid,
+        decimal? offer)
+    {
+        var res = new Quote
+        {
+            QuoteID = new QuoteID(Guid.NewGuid().ToString()),
+            Symbol = new Symbol("[N/A]"),
+            SecurityID = new SecurityID(securityId),
+            SecurityIDSource = new SecurityIDSource(_hihiClubSecuritySourceId),
+            QuoteType = new QuoteType(QuoteType.INDICATIVE),
+            TransactTime = new TransactTime(DateTime.UtcNow)
+        };
+
+        if (bid.HasValue)
+        {
+            res.BidPx = new BidPx(bid.Value);
+        }
+
+        if (offer.HasValue)
+        {
+            res.OfferPx = new OfferPx(offer.Value);
+        }
+
+        return res;
+    }
 }
