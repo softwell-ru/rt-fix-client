@@ -31,6 +31,7 @@ var builder = Host.CreateDefaultBuilder()
         AddScenario<SendQuotationsRequestReceiveRefreshed>(services);
         AddScenario<ReceiveDeal>(services);
         AddScenario<SendDealsRequestAndReceiveDeals>(services);
+        AddScenario<SendQuotation>(services);
     });
 
 using var host = builder.Build();

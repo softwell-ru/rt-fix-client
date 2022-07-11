@@ -1,6 +1,14 @@
 <fix major='5' type='FIX' servicepack='2' minor='0'>
   <header />
   <messages>
+    <message name='Quote' msgcat='app' msgtype='S'>
+      <field name='QuoteID' required='Y' />
+      <field name='QuoteType' required='Y' />
+      <field name='TransactTime' required='Y' />
+      <field name='BidPx' required='N' />
+      <field name='OfferPx' required='N' />
+      <component name='Instrument' required='Y' />
+    </message>
     <message name='MarketDataRequest' msgcat='app' msgtype='V'>
       <field name='MDReqID' required='Y' />
       <field name='SubscriptionRequestType' required='Y' />
@@ -639,9 +647,6 @@
     </field>
     <field number='537' name='QuoteType' type='INT'>
       <value enum='0' description='INDICATIVE' />
-      <value enum='1' description='TRADEABLE' />
-      <value enum='2' description='RESTRICTED_TRADEABLE' />
-      <value enum='3' description='COUNTER' />
     </field>
     <field number='541' name='MaturityDate' type='LOCALMKTDATE' />
     <field number='552' name='NoSides' type='NUMINGROUP'>
@@ -733,5 +738,8 @@
     <field number='1410' name='DefaultVerIndicator' type='BOOLEAN' />
     <field number='1500' name='MDStreamID' type='STRING' />
     <field number='11001' name='RT_PRODUCT' type='STRING' />
+    <field number='117' name='QuoteID' type='STRING' />
+    <field number='132' name='BidPx' type='PRICE' />
+    <field number='133' name='OfferPx' type='PRICE' />
   </fields>
 </fix>

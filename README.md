@@ -43,3 +43,7 @@ dotnet run [arguments]
 #### SendQuotationsRequestReceiveSnapshots
 
 Отправить запрос на котировки, получить текущие значения
+
+#### SendQuotation
+
+Отправить котировку, за 10 секунд не дождаться сообщения об ошибке
