@@ -21,7 +21,7 @@ public class SendQuotation : ScenarioBase
 
     protected override async Task RunAsyncInner(ScenarioContext context, CancellationToken ct)
     {
-        var request = Helpers.CreateQuote("FX-USD-RUB-TOM", 123, 456);
+        var request = Helpers.CreateQuote("FX-USD-RUB-TOM", 61.5m, 62.5m);
 
         context.Client.SendMessage(request);
 
