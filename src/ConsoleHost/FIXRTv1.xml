@@ -64,6 +64,7 @@
       <field name='PriceType' required='N' />
       <field name='RT_PRODUCT' required='N' />
       <component name='Instrument' required='N' />
+      <component name='TrdInstrmtLegGrp' required='N' />
       <field name='QtyType' required='N' />
       <field name='LastQty' required='N' />
       <field name='LastPx' required='N' />
@@ -170,6 +171,18 @@
       <field name='SecurityXMLLen' required='N' />
       <field name='SecurityXML' required='N' />
       <field name='SecurityXMLSchema' required='N' />
+    </component>
+    <component name='TrdInstrmtLegGrp'>
+      <group name='NoLegs' required='N'>
+        <component name='InstrumentLeg' required='N' />
+        <field name='LegLastPx' required='N' />
+        <field name='LegCalculatedCcyLastQty' required='N' />
+        <field name='LegNumber' required='N' />
+        <field name='LegLastQty' required='N' />
+      </group>
+    </component>
+    <component name='InstrumentLeg'>
+      <field name='LegCurrency' required='N' />
     </component>
   </components>
   <fields>
@@ -738,8 +751,15 @@
     <field number='1410' name='DefaultVerIndicator' type='BOOLEAN' />
     <field number='1500' name='MDStreamID' type='STRING' />
     <field number='11001' name='RT_PRODUCT' type='STRING' />
+
     <field number='117' name='QuoteID' type='STRING' />
     <field number='132' name='BidPx' type='PRICE' />
     <field number='133' name='OfferPx' type='PRICE' />
+    <field number='637' name='LegLastPx' type='PRICE' />
+    <field number='1074' name='LegCalculatedCcyLastQty' type='QTY' />
+    <field number='1152' name='LegNumber' type='INT' />
+    <field number='1418' name='LegLastQty' type='QTY' />
+    <field number='556' name='LegCurrency' type='CURRENCY' />
+    <field number='555' name='NoLegs' type='NUMINGROUP' />
   </fields>
 </fix>
