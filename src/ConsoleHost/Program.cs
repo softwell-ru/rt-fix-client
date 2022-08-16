@@ -27,12 +27,12 @@ var builder = Host.CreateDefaultBuilder()
                 .SetMinimumLevel(LogLevel.Debug));
 
         services.AddSingleton(scenarioSettings);
-        // AddScenario<SendQuotationsRequestReceiveSnapshots>(services);
-        // AddScenario<SendQuotationsRequestReceiveRefreshed>(services);
-        // AddScenario<ReceiveDeal>(services);
-        // AddScenario<SendDealsRequestAndReceiveDeals>(services);
-        // AddScenario<SendQuotation>(services);
-        // AddScenario<ReceiveChats>(services);
+        AddScenario<SendQuotationsRequestReceiveSnapshots>(services);
+        AddScenario<SendQuotationsRequestReceiveRefreshed>(services);
+        AddScenario<ReceiveDeal>(services);
+        AddScenario<SendDealsRequestAndReceiveDeals>(services);
+        AddScenario<SendQuotation>(services);
+        AddScenario<ReceiveChats>(services);
         AddScenario<SendChatsRequestAndReceiveChats>(services);
     });
 
