@@ -119,4 +119,27 @@ public static class Helpers
 
         return res;
     }
+
+    public static QuickFix.Message CreateChatsRequest(DateTime minDate, DateTime? maxDate)
+    {
+        var msg = new QuickFix.Message();
+
+        msg.Header.SetField(new BeginString("FIXT.1.1"));
+        msg.Header.SetField(new MsgType("UR"));
+
+        msg.SetField(new StringField(11004, Guid.NewGuid().ToString())); // ChatsRequestID
+
+        var startGr = new QuickFix.Group(11005, Tags.TransactTime);
+        startGr.SetField(new TransactTime(minDate.ToUniversalTime()));
+        msg.AddGroup(startGr);
+
+        if (maxDate.HasValue)
+        {
+            var endGr = new QuickFix.Group(11005, Tags.TransactTime);
+            endGr.SetField(new TransactTime(maxDate.Value.ToUniversalTime()));
+            msg.AddGroup(endGr);
+        }
+
+        return msg;
+    }
 }

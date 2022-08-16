@@ -77,6 +77,7 @@
       <field name='Username' required='N'/>
       <field name='Password' required='N'/>
       <field name='NewPassword' required='N' />
+
       <field name='DefaultApplVerID' required='N'/>
       <component name='MsgTypeGrp' required='N'/>
     </message>
@@ -207,6 +208,11 @@
       <value enum='BN' description='EXECUTION_ACKNOWLEDGEMENT'/>
       <value enum='BO' description='CONTRARY_INTENTION_REPORT'/>
       <value enum='BP' description='SECURITY_DEFINITION_UPDATE_REPORT'/>
+      <value enum='US' description='CHAT_START_MESSAGE'/>
+      <value enum='UE' description='CHAT_END_MESSAGE'/>
+      <value enum='UM' description='CHAT_MESSAGE'/>
+      <value enum='UR' description='CHATS_REQUEST'/>
+      <value enum='UW' description='CHATS_REQUEST_ACK'/>
     </field>
     <field name='NewSeqNo' number='36' type='SEQNUM'/>
     <field name='PossDupFlag' number='43' type='BOOLEAN'/>
