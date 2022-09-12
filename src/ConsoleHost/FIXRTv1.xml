@@ -81,6 +81,7 @@
       <field name='Currency' required='N' />
       <field name='SettlCurrency' required='N' />
       <field name='RejectText' required='N' />
+      <field name='Base64Text' required='N' />
     </message>
     <message name='TradeCaptureReportRequestAck' msgcat='app' msgtype='AQ'>
       <field name='TradeRequestID' required='N' />
