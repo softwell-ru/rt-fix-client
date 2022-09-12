@@ -1,3 +1,4 @@
+using System.Text;
 using QuickFix.Fields;
 using QuickFix.FIX50SP2;
 
@@ -128,18 +129,37 @@ public static class Helpers
         msg.Header.SetField(new MsgType("UR"));
 
         msg.SetField(new StringField(11004, Guid.NewGuid().ToString())); // ChatsRequestID
+        msg.SetField(new StringField(11002, "b3c820cd-bfdc-49dd-bdb2-c8811b94edc8")); // ChatID
 
-        var startGr = new QuickFix.Group(11005, Tags.TransactTime);
-        startGr.SetField(new TransactTime(minDate.ToUniversalTime()));
-        msg.AddGroup(startGr);
+        // b3c820cd-bfdc-49dd-bdb2-c8811b94edc8
 
-        if (maxDate.HasValue)
-        {
-            var endGr = new QuickFix.Group(11005, Tags.TransactTime);
-            endGr.SetField(new TransactTime(maxDate.Value.ToUniversalTime()));
-            msg.AddGroup(endGr);
-        }
+        // var startGr = new QuickFix.Group(11005, Tags.TransactTime);
+        // startGr.SetField(new TransactTime(minDate.ToUniversalTime()));
+        // msg.AddGroup(startGr);
+
+        // if (maxDate.HasValue)
+        // {
+        //     var endGr = new QuickFix.Group(11005, Tags.TransactTime);
+        //     endGr.SetField(new TransactTime(maxDate.Value.ToUniversalTime()));
+        //     msg.AddGroup(endGr);
+        // }
 
         return msg;
+    }
+
+    public static string? GetAndDecodeBase64Text(QuickFix.Message message)
+    {
+        var field = new StringField(11008);
+        if (!message.IsSetField(field)) return null;
+
+        var base64 = message.GetField(field).getValue();
+
+        if (string.IsNullOrWhiteSpace(base64)) return null;
+
+        var bytes = Convert.FromBase64String(base64);
+
+        var res = Encoding.UTF8.GetString(bytes);
+
+        return res;
     }
 }

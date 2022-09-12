@@ -36,7 +36,7 @@ public class SendChatsRequestAndReceiveChats : ScenarioBase
 
                 Logger.LogInformation(
                     @"Получили сообщение о начала чата {subject}, id={id}",
-                    msg.GetField(new Subject()),
+                    Helpers.GetAndDecodeBase64Text(msg),
                     msg.GetField(new StringField(11002)));
                 count++;
             }
@@ -54,7 +54,7 @@ public class SendChatsRequestAndReceiveChats : ScenarioBase
                 Logger.LogInformation(
                     @"Получили фоновое сообщение из чата {id}: {message}",
                     msg.GetField(new StringField(11002)),
-                    msg.GetField(new Text()));
+                    Helpers.GetAndDecodeBase64Text(msg));
 
                 count++;
             }
