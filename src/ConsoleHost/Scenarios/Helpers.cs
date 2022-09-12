@@ -129,20 +129,18 @@ public static class Helpers
         msg.Header.SetField(new MsgType("UR"));
 
         msg.SetField(new StringField(11004, Guid.NewGuid().ToString())); // ChatsRequestID
-        msg.SetField(new StringField(11002, "b3c820cd-bfdc-49dd-bdb2-c8811b94edc8")); // ChatID
+        // msg.SetField(new StringField(11002, "some-id")); // ChatID
 
-        // b3c820cd-bfdc-49dd-bdb2-c8811b94edc8
+        var startGr = new QuickFix.Group(11005, Tags.TransactTime);
+        startGr.SetField(new TransactTime(minDate.ToUniversalTime()));
+        msg.AddGroup(startGr);
 
-        // var startGr = new QuickFix.Group(11005, Tags.TransactTime);
-        // startGr.SetField(new TransactTime(minDate.ToUniversalTime()));
-        // msg.AddGroup(startGr);
-
-        // if (maxDate.HasValue)
-        // {
-        //     var endGr = new QuickFix.Group(11005, Tags.TransactTime);
-        //     endGr.SetField(new TransactTime(maxDate.Value.ToUniversalTime()));
-        //     msg.AddGroup(endGr);
-        // }
+        if (maxDate.HasValue)
+        {
+            var endGr = new QuickFix.Group(11005, Tags.TransactTime);
+            endGr.SetField(new TransactTime(maxDate.Value.ToUniversalTime()));
+            msg.AddGroup(endGr);
+        }
 
         return msg;
     }
