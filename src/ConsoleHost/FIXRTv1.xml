@@ -60,7 +60,6 @@
       <field name='TradeRequestID' required='N' />
       <field name='TotNumTradeReports' required='N' />
       <field name='LastRptRequested' required='N' />
-      <field name='UnsolicitedIndicator' required='N' />
       <field name='PriceType' required='N' />
       <field name='ChatID' required='N' />
       <field name='RT_PRODUCT' required='N' />
@@ -74,10 +73,7 @@
       <field name='TransactTime' required='N' />
       <field name='SettlDate' required='N' />
       <component name='TrdCapRptSideGrp' required='N' />
-      <field name='TrdRptStatus' required='N' />
-      <field name='LastUpdateTime' required='N' />
       <field name='TradeID' required='N' />
-      <field name='TZTransactTime' required='N' />
       <field name='Currency' required='N' />
       <field name='SettlCurrency' required='N' />
       <field name='RejectText' required='N' />
@@ -215,7 +211,6 @@
     <component name='SecurityXML'>
       <field name='SecurityXMLLen' required='N' />
       <field name='SecurityXML' required='N' />
-      <field name='SecurityXMLSchema' required='N' />
     </component>
     <component name='TrdInstrmtLegGrp'>
       <group name='NoLegs' required='N'>
@@ -515,10 +510,6 @@
       <value enum='D' description='INSUFFICIENT_CREDIT' />
     </field>
     <field number='304' name='TotNoQuoteEntries' type='INT' />
-    <field number='325' name='UnsolicitedIndicator' type='BOOLEAN'>
-      <value enum='N' description='NO' />
-      <value enum='Y' description='YES' />
-    </field>
     <field number='354' name='EncodedTextLen' type='LENGTH' />
     <field number='355' name='EncodedText' type='DATA' />
     <field number='369' name='LastMsgSeqNumProcessed' type='SEQNUM' />
@@ -754,11 +745,6 @@
     <field number='925' name='NewPassword' type='STRING' />
     <field number='930' name='RefCompID' type='STRING' />
     <field number='931' name='RefSubID' type='STRING' />
-    <field number='939' name='TrdRptStatus' type='INT'>
-      <value enum='0' description='ACCEPTED' />
-      <value enum='1' description='REJECTED' />
-      <value enum='3' description='ACCEPTED_WITH_ERRORS' />
-    </field>
     <field number='963' name='MDReportID' type='INT' />
     <field number='1003' name='TradeID' type='STRING' />
     <field number='1128' name='ApplVerID' type='STRING'>
@@ -766,14 +752,12 @@
     </field>
     <field number='1130' name='RefApplVerID' type='STRING' />
     <field number='1131' name='RefCstmApplVerID' type='STRING' />
-    <field number='1132' name='TZTransactTime' type='TZTIMESTAMP' />
     <field number='1180' name='ApplID' type='STRING' />
     <field number='1181' name='ApplSeqNum' type='SEQNUM' />
     <field number='1182' name='ApplBegSeqNum' type='SEQNUM' />
     <field number='1183' name='ApplEndSeqNum' type='SEQNUM' />
     <field number='1184' name='SecurityXMLLen' type='LENGTH' />
     <field number='1185' name='SecurityXML' type='XMLDATA' />
-    <field number='1186' name='SecurityXMLSchema' type='STRING' />
     <field number='1328' name='RejectText' type='STRING' />
     <field number='1346' name='ApplReqID' type='STRING' />
     <field number='1347' name='ApplReqType' type='INT'>

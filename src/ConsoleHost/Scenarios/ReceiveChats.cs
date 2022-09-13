@@ -33,7 +33,7 @@ public class ReceiveChats : ScenarioBase
                 if (msg.IsSetField(11004)) continue;
 
                 Logger.LogInformation(
-                    @"Получили фоновое сообщение о начала чата {subject}, id={id}",
+                    @"Получили фоновое сообщение о начале чата {subject}, id={id}",
                     Helpers.GetAndDecodeBase64Text(msg),
                     msg.GetField(new StringField(11002)));
                 startReceived = true;

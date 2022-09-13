@@ -35,7 +35,7 @@ public class SendChatsRequestAndReceiveChats : ScenarioBase
                 if (!msg.IsSetField(11004) || msg.GetString(11004) != id) continue;
 
                 Logger.LogInformation(
-                    @"Получили сообщение о начала чата {subject}, id={id}",
+                    @"Получили сообщение о начале чата {subject}, id={id}",
                     Helpers.GetAndDecodeBase64Text(msg),
                     msg.GetField(new StringField(11002)));
                 count++;
