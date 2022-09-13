@@ -56,31 +56,79 @@
     </message>
     <message name='TradeCaptureReport' msgcat='app' msgtype='AE'>
       <field name='TradeReportID' required='N' />
+      <field name='TradeReportTransType' required='N' />
+      <field name='TradeRequestID' required='N' />
+      <field name='TotNumTradeReports' required='N' />
+      <field name='LastRptRequested' required='N' />
+      <field name='PriceType' required='N' />
+      <field name='ChatID' required='N' />
+      <field name='RT_PRODUCT' required='N' />
+      <component name='Instrument' required='N' />
+      <component name='TrdInstrmtLegGrp' required='N' />
+      <field name='QtyType' required='N' />
+      <field name='LastQty' required='N' />
+      <field name='LastPx' required='N' />
+      <field name='LastMkt' required='N' />
       <field name='TradeDate' required='N' />
       <field name='TransactTime' required='N' />
-      <field name='LastQty' required='N' />
-      <field name='CalculatedCcyLastQty' required='N' />
-      <field name='LastPx' required='N' />
+      <field name='SettlDate' required='N' />
+      <component name='TrdCapRptSideGrp' required='N' />
+      <field name='TradeID' required='N' />
       <field name='Currency' required='N' />
       <field name='SettlCurrency' required='N' />
-      <field name='SettlDate' required='N' />
-      <field name='MaturityDate' required='N' />
-      <component name='TrdInstrmtLegGrp' required='N' />
-      <field name='RT_PRODUCT' required='N' />
-      <field name='EncodedText' required='N' />
-      <field name='EncodedTextLen' required='N' />
-      <field name='ExecType' required='N' />
-      <component name='TrdCapRptSideGrp' required='N' />
-      <field name='TradeRequestID' required='N' />
-      <component name='SecurityXML' required='N' />
+      <field name='RejectText' required='N' />
+      <field name='Base64Text' required='N' />
     </message>
     <message name='TradeCaptureReportRequestAck' msgcat='app' msgtype='AQ'>
       <field name='TradeRequestID' required='N' />
       <field name='TradeRequestType' required='N' />
+      <field name='TotNumTradeReports' required='N' />
       <field name='TradeRequestResult' required='N' />
       <field name='TradeRequestStatus' required='N' />
       <field name='Text' required='N' />
     </message>
+
+    <message name='ChatsRequest' msgcat='app' msgtype='UR'>
+      <field name='ChatsRequestID' required='Y' />
+      <field name='ChatID' required='N' />
+      <group name='NoChatDates' required='N'>
+        <field name='TransactTime' required='Y' />
+      </group>
+    </message>
+
+    <message name='ChatsRequestAck' msgcat='app' msgtype='UW'>
+      <field name='ChatsRequestID' required='Y' />
+      <field name='ChatsRequestResult' required='Y' />
+      <field name='ChatsRequestStatus' required='Y' />
+      <field name='Text' required='N' />
+    </message>
+
+    <message name='ChatStartMessage' msgcat='app' msgtype='US'>
+      <field name='ChatID' required='Y' />
+      <field name='Base64Text' required='Y' />
+      <field name='Direction' required='Y' />
+      <field name='TransactTime' required='Y' />
+      <component name='Parties' required='N' />
+      <field name='ChatsRequestID' required='N' />
+    </message>
+
+    <message name='ChatEndMessage' msgcat='app' msgtype='UE'>
+      <field name='ChatID' required='Y' />
+      <field name='TransactTime' required='Y' />
+      <component name='Parties' required='N' />
+      <field name='ChatsRequestID' required='N' />
+    </message>
+
+    <message name='ChatMessage' msgcat='app' msgtype='UM'>
+      <field name='ChatID' required='Y' />
+      <field name='ChatMessageID' required='Y' />
+      <field name='TransactTime' required='Y' />
+      <field name='Base64Text' required='Y' />
+      <field name='Direction' required='Y' />
+      <component name='PartyInfo' required='N' />
+      <field name='ChatsRequestID' required='N' />
+    </message>
+
   </messages>
   <trailer />
   <components>
@@ -88,6 +136,9 @@
       <group name='NoSides' required='N'>
         <field name='Side' required='N' />
         <component name='Parties' required='N' />
+        <field name='Text' required='N' />
+        <field name='EncodedTextLen' required='N' />
+        <field name='EncodedText' required='N' />
       </group>
     </component>
     <component name='MDReqGrp'>
@@ -95,10 +146,13 @@
         <field name='MDEntryType' required='N' />
       </group>
     </component>
-    <component name='PartyDetail'>
+    <component name='PartyInfo'>
       <field name='PartyID' required='N' />
       <field name='PartyIDSource' required='N' />
       <field name='PartyRole' required='N' />
+    </component>
+    <component name='PartyDetail'>
+      <component name='PartyInfo' required='N' />
       <component name='PtysSubGrp' required='N' />
     </component>
     <component name='Instrument'>
@@ -119,9 +173,7 @@
     </component>
     <component name='Parties'>
       <group name='NoPartyIDs' required='N'>
-        <field name='PartyID' required='N' />
-        <field name='PartyIDSource' required='N' />
-        <field name='PartyRole' required='N' />
+        <component name='PartyInfo' required='N' />
       </group>
     </component>
     <component name='InstrmtGrp'>
@@ -164,9 +216,9 @@
       <group name='NoLegs' required='N'>
         <component name='InstrumentLeg' required='N' />
         <field name='LegLastPx' required='N' />
-        <field name='LegLastQty' required='N' />
         <field name='LegCalculatedCcyLastQty' required='N' />
         <field name='LegNumber' required='N' />
+        <field name='LegLastQty' required='N' />
       </group>
     </component>
     <component name='InstrumentLeg'>
@@ -328,6 +380,11 @@
       <value enum='x' description='SECURITYLISTREQUEST' />
       <value enum='y' description='SECURITYLIST' />
       <value enum='z' description='DERIVATIVESECURITYLISTREQUEST' />
+      <value enum='US' description='CHAT_START_MESSAGE'/>
+      <value enum='UE' description='CHAT_END_MESSAGE'/>
+      <value enum='UM' description='CHAT_MESSAGE'/>
+      <value enum='UR' description='CHATS_REQUEST'/>
+      <value enum='UW' description='CHATS_REQUEST_ACK'/>
     </field>
     <field number='36' name='NewSeqNo' type='SEQNUM' />
     <field number='43' name='PossDupFlag' type='BOOLEAN'>
@@ -453,16 +510,8 @@
       <value enum='D' description='INSUFFICIENT_CREDIT' />
     </field>
     <field number='304' name='TotNoQuoteEntries' type='INT' />
-    <field number='325' name='UnsolicitedIndicator' type='BOOLEAN'>
-      <value enum='N' description='NO' />
-      <value enum='Y' description='YES' />
-    </field>
     <field number='354' name='EncodedTextLen' type='LENGTH' />
     <field number='355' name='EncodedText' type='DATA' />
-    <field number='150' name='ExecType' type='CHAR'>
-      <value enum='F' description='TRADE' />
-    </field>
-    <field number='1056' name='CalculatedCcyLastQty' type='QTY' />
     <field number='369' name='LastMsgSeqNumProcessed' type='SEQNUM' />
     <field number='372' name='RefMsgType' type='STRING' />
     <field number='373' name='SessionRejectReason' type='INT'>
@@ -696,11 +745,6 @@
     <field number='925' name='NewPassword' type='STRING' />
     <field number='930' name='RefCompID' type='STRING' />
     <field number='931' name='RefSubID' type='STRING' />
-    <field number='939' name='TrdRptStatus' type='INT'>
-      <value enum='0' description='ACCEPTED' />
-      <value enum='1' description='REJECTED' />
-      <value enum='3' description='ACCEPTED_WITH_ERRORS' />
-    </field>
     <field number='963' name='MDReportID' type='INT' />
     <field number='1003' name='TradeID' type='STRING' />
     <field number='1128' name='ApplVerID' type='STRING'>
@@ -708,7 +752,6 @@
     </field>
     <field number='1130' name='RefApplVerID' type='STRING' />
     <field number='1131' name='RefCstmApplVerID' type='STRING' />
-    <field number='1132' name='TZTransactTime' type='TZTIMESTAMP' />
     <field number='1180' name='ApplID' type='STRING' />
     <field number='1181' name='ApplSeqNum' type='SEQNUM' />
     <field number='1182' name='ApplBegSeqNum' type='SEQNUM' />
@@ -752,5 +795,27 @@
     <field number='1418' name='LegLastQty' type='QTY' />
     <field number='556' name='LegCurrency' type='CURRENCY' />
     <field number='555' name='NoLegs' type='NUMINGROUP' />
+
+    <field number='11002' name='ChatID' type='STRING' />
+    <field number='11003' name='ChatMessageID' type='STRING' />
+    <field number='147' name='Subject' type='STRING' />
+
+    <field number='11004' name='ChatsRequestID' type='STRING' />
+    <field number='11005' name='NoChatDates' type='INT' />
+    <field number='11006' name='ChatsRequestResult' type='INT'>
+      <value enum='0' description='SUCCESSFUL' />
+      <value enum='99' description='OTHER' />
+    </field>
+    <field number='11007' name='ChatsRequestStatus' type='INT'>
+      <value enum='0' description='COMPLETED' />
+      <value enum='1' description='REJECTED' />
+    </field>
+
+    <field number='11008' name='Base64Text' type='STRING' />
+
+    <field number='11009' name='Direction' type='INT'>
+      <value enum='0' description='INCOMING' />
+      <value enum='1' description='OUTGOING' />
+    </field>
   </fields>
 </fix>
