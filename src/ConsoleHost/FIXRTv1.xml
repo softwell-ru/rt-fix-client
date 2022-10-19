@@ -62,7 +62,9 @@
       <field name='LastRptRequested' required='N' />
       <field name='PriceType' required='N' />
       <field name='ChatID' required='N' />
-      <field name='RT_PRODUCT' required='N' />
+      <field name='RTProduct' required='N' />
+      <field name='CalculatedCcyLastQty' required='N' />
+      <field name='ExecType' required='N' />
       <component name='Instrument' required='N' />
       <component name='TrdInstrmtLegGrp' required='N' />
       <field name='QtyType' required='N' />
@@ -784,7 +786,7 @@
     <field number='1406' name='RefApplExtID' type='INT' />
     <field number='1410' name='DefaultVerIndicator' type='BOOLEAN' />
     <field number='1500' name='MDStreamID' type='STRING' />
-    <field number='11001' name='RT_PRODUCT' type='STRING' />
+    <field number='11001' name='RTProduct' type='STRING' />
 
     <field number='117' name='QuoteID' type='STRING' />
     <field number='132' name='BidPx' type='PRICE' />
@@ -817,5 +819,11 @@
       <value enum='0' description='INCOMING' />
       <value enum='1' description='OUTGOING' />
     </field>
+
+    <field number='150' name='ExecType' type='CHAR'>
+      <value enum='F' description='TRADE' />
+    </field>
+
+    <field number='1056' name='CalculatedCcyLastQty' type='QTY' />
   </fields>
 </fix>
