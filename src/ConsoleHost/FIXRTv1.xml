@@ -162,6 +162,7 @@
       <field name='SecurityID' required='N' />
       <field name='SecurityIDSource' required='N' />
       <field name='MaturityDate' required='N' />
+      <component name='SecurityXML' required='N' />
     </component>
     <component name='InstrmtMDReqGrp'>
       <group name='NoRelatedSym' required='N'>
