@@ -131,6 +131,11 @@
       <field name='ChatsRequestID' required='N' />
     </message>
 
+    <message name='QuoteCancel' msgcat='app' msgtype='Z'>
+      <component name='QuotCxlEntriesGrp' required='Y' />
+      <field name='QuoteMsgID' required='Y' />
+    </message>
+
   </messages>
   <trailer />
   <components>
@@ -226,6 +231,11 @@
     </component>
     <component name='InstrumentLeg'>
       <field name='LegCurrency' required='N' />
+    </component>
+    <component name='QuotCxlEntriesGrp'>
+      <group name='NoQuoteEntries' required='Y'>
+        <component name='Instrument' required='Y' />
+      </group>
     </component>
   </components>
   <fields>
@@ -824,6 +834,9 @@
     <field number='150' name='ExecType' type='CHAR'>
       <value enum='F' description='TRADE' />
     </field>
+
+    <field number='295' name='NoQuoteEntries' type='NUMINGROUP' />
+    <field number='1166' name='QuoteMsgID' type='STRING' />
 
     <field number='1056' name='CalculatedCcyLastQty' type='QTY' />
   </fields>

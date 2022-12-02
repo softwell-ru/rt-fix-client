@@ -21,13 +21,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="FIXT11.xml">
+    <None Include="FIXT11.xml" Condition="Exists('FIXT11.xml')">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="FIXRTv1.xml">
+    <None Include="FIXRTv1.xml" Condition="Exists('FIXRTv1.xml')">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="SessionSettings.cfg">
+    <None Include="SessionSettings.cfg" Condition="Exists('SessionSettings.cfg')">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="SessionSettings.local.cfg" Condition="Exists('SessionSettings.local.cfg')">

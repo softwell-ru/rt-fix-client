@@ -32,6 +32,7 @@ var builder = Host.CreateDefaultBuilder()
         AddScenario<ReceiveDeal>(services);
         AddScenario<SendDealsRequestAndReceiveDeals>(services);
         AddScenario<SendQuotation>(services);
+        AddScenario<CancelQuotation>(services);
         AddScenario<ReceiveChats>(services);
         AddScenario<SendChatsRequestAndReceiveChats>(services);
     });

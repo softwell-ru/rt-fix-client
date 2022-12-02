@@ -121,6 +121,24 @@ public static class Helpers
         return res;
     }
 
+    public static QuoteCancel CreateQuoteCancel(
+        string securityId)
+    {
+        var res = new QuoteCancel
+        {
+            QuoteMsgID = new QuoteMsgID(Guid.NewGuid().ToString())
+        };
+
+        res.AddGroup(new QuoteCancel.NoQuoteEntriesGroup
+        {
+            Symbol = new Symbol("[N/A]"),
+            SecurityID = new SecurityID(securityId),
+            SecurityIDSource = new SecurityIDSource(_hihiClubSecuritySourceId)
+        });
+
+        return res;
+    }
+
     public static QuickFix.Message CreateChatsRequest(DateTime minDate, DateTime? maxDate)
     {
         var msg = new QuickFix.Message();
