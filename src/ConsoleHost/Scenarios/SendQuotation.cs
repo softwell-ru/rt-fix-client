@@ -5,10 +5,8 @@ using SoftWell.RtFix.ConsoleHost.Scenarios.Infrastructure;
 
 namespace SoftWell.RtFix.ConsoleHost.Scenarios;
 
-public class SendQuotation : ScenarioBase
+public class SendQuotation : QuotationScenarioBase
 {
-    private readonly TimeSpan _waitErrorTimeout = TimeSpan.FromSeconds(10);
-
     public SendQuotation(
         ScenarioSettings settings,
         ILoggerFactory loggerFactory) : base(settings, loggerFactory)
@@ -17,35 +15,59 @@ public class SendQuotation : ScenarioBase
 
     public override string Name => nameof(SendQuotation);
 
-    public override string? Description => $"Отправить котировку, за {_waitErrorTimeout} не дождаться сообщения об ошибке";
+    public override string? Description => $"Отправить котировку, дождаться сообщения с измененными ценами";
 
     protected override async Task RunAsyncInner(ScenarioContext context, CancellationToken ct)
     {
-        var request = Helpers.CreateQuote("FX-USD-RUB-TOM", 61.5m, 62.5m);
+        SubscribeToRefreshes(context);
+        await WaitForSnapshotFullRefreshAsync(context, ct);
+
+        const decimal bid = 61.35m;
+        const decimal offer = 64.37m;
+        var request = Helpers.CreateQuote(QuotationSecurityId, bid, offer);
 
         context.Client.SendMessage(request);
 
-        Logger.LogInformation("Отправили котировку, ожидаем, что за {timeout} не получим ошибку", _waitErrorTimeout);
+        Logger.LogInformation("Отправили котировку, ожидаем обновления..");
 
-        try
+        var isBidSet = false;
+        var isOfferSet = false;
+
+        await foreach (var msg in context.Client.ReadAllMessagesAsync(ct))
         {
-            using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
-            cts.CancelAfter(_waitErrorTimeout);
-
-            await foreach (var msg in context.Client.ReadAllMessagesAsync(cts.Token))
+            if (msg.IsOfType<MarketDataIncrementalRefresh>(MsgType.MARKET_DATA_INCREMENTAL_REFRESH, out var mdr))
             {
-                if (msg.IsOfType<BusinessMessageReject>(MsgType.BUSINESS_MESSAGE_REJECT, out var bmr)
-                    && bmr.RefMsgType.getValue() == MsgType.QUOTE
-                    && bmr.IsSetBusinessRejectRefID()
-                    && bmr.BusinessRejectRefID.getValue() == request.QuoteID.getValue())
+                foreach (var g in EnumerateMDEntriesGroups(mdr))
                 {
-                    throw new Exception($"Котировка отклонена с причиной {bmr.BusinessRejectReason.getValue()}: {bmr.Text.getValue()}");
+                    if (g.MDUpdateAction.getValue() == MDUpdateAction.NEW
+                            && g.SecurityID.getValue() == QuotationSecurityId)
+                    {
+                        var type = g.MDEntryType.getValue();
+
+                        if (type == MDEntryType.BID && g.MDEntryPx.getValue() == bid)
+                        {
+                            isBidSet = true;
+                        }
+                        if (type == MDEntryType.OFFER && g.MDEntryPx.getValue() == offer)
+                        {
+                            isOfferSet = true;
+                        }
+                    }
                 }
             }
-        }
-        catch (OperationCanceledException)
-        {
-            Logger.LogInformation("За {timeout} не получили ошибку", _waitErrorTimeout);
+            else if (msg.IsOfType<BusinessMessageReject>(MsgType.BUSINESS_MESSAGE_REJECT, out var bmr)
+                && bmr.RefMsgType.getValue() == MsgType.QUOTE
+                && bmr.IsSetBusinessRejectRefID()
+                && bmr.BusinessRejectRefID.getValue() == request.QuoteID.getValue())
+            {
+                throw new Exception($"Котировка отклонена с причиной {bmr.BusinessRejectReason.getValue()}: {bmr.Text.getValue()}");
+            }
+
+            if (isBidSet && isOfferSet)
+            {
+                Logger.LogInformation("Получили обновление котировки с нужными ценами");
+                return;
+            }
         }
     }
 }
