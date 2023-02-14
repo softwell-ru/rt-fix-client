@@ -5,7 +5,7 @@ using SoftWell.RtFix.ConsoleHost.Scenarios.Infrastructure;
 
 namespace SoftWell.RtFix.ConsoleHost.Scenarios;
 
-public class SendQuotationsRequestReceiveSnapshots : ScenarioBase
+public class SendQuotationsRequestReceiveSnapshots : QuotationScenarioBase
 {
     public SendQuotationsRequestReceiveSnapshots(
         ScenarioSettings settings,
@@ -49,7 +49,15 @@ public class SendQuotationsRequestReceiveSnapshots : ScenarioBase
             }
             else if (msg.IsOfType<MarketDataRequestReject>(MsgType.MARKET_DATA_REQUEST_REJECT, out var mdrr))
             {
-                throw new Exception("Запрос на получение котировок был отклонен с причиной " + mdrr.MDReqRejReason.getValue());
+                var reason = mdrr.MDReqRejReason.getValue();
+                if (reason == MDReqRejReason.UNKNOWN_SYMBOL)
+                {
+                    Logger.LogWarning("На запрос на получение котировок сервер ответил следующими предупреждениями: {warnings}", mdrr.Text.getValue());
+                }
+                else
+                {
+                    throw new Exception($"Запрос на получение котировок был отклонен с причиной {reason}: {mdrr.Text.getValue()}");
+                }
             }
             else if (
                 msg.IsOfType<BusinessMessageReject>(MsgType.BUSINESS_MESSAGE_REJECT, out var bmr)
