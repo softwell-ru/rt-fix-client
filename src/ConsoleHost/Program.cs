@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using QuickFix;
@@ -20,11 +21,18 @@ void AddScenario<TScenario>(IServiceCollection services) where TScenario : class
 }
 
 var builder = Host.CreateDefaultBuilder()
-    .ConfigureServices(services =>
+    .ConfigureHostConfiguration(
+        builder => builder
+            .AddJsonFile("appsettings.json", true)
+            .AddJsonFile("appsettings.local.json", true))
+    .ConfigureServices((host, services) =>
     {
         services.AddLogging(
             o => o.AddConsole()
                 .SetMinimumLevel(LogLevel.Debug));
+
+        services.AddOptions<SendQuotationsBatchRequestReceiveRefreshedIndefinitelyOptions>()
+            .Bind(host.Configuration.GetSection(nameof(SendQuotationsBatchRequestReceiveRefreshedIndefinitely)));
 
         services.AddSingleton(scenarioSettings);
         AddScenario<SendQuotationsRequestReceiveSnapshots>(services);
@@ -35,6 +43,7 @@ var builder = Host.CreateDefaultBuilder()
         AddScenario<CancelQuotation>(services);
         AddScenario<ReceiveChats>(services);
         AddScenario<SendChatsRequestAndReceiveChats>(services);
+        AddScenario<SendQuotationsBatchRequestReceiveRefreshedIndefinitely>(services);
     });
 
 using var host = builder.Build();

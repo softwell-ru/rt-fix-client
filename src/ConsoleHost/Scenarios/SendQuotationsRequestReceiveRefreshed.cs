@@ -5,7 +5,7 @@ using SoftWell.RtFix.ConsoleHost.Scenarios.Infrastructure;
 
 namespace SoftWell.RtFix.ConsoleHost.Scenarios;
 
-public class SendQuotationsRequestReceiveRefreshed : ScenarioBase
+public class SendQuotationsRequestReceiveRefreshed : QuotationScenarioBase
 {
     public SendQuotationsRequestReceiveRefreshed(
         ScenarioSettings settings,
@@ -19,7 +19,7 @@ public class SendQuotationsRequestReceiveRefreshed : ScenarioBase
 
     protected override async Task RunAsyncInner(ScenarioContext context, CancellationToken ct)
     {
-        var request = Helpers.CreateQuotationRequest(new[] { "FX-USD-RUB-TOM" }, null);
+        var request = Helpers.CreateQuotationRequest(new[] { QuotationSecurityId }, null);
         context.Client.SendMessage(request);
 
         Logger.LogInformation("Отправили запрос на котировки, ожидаем хотя бы одно обновление котировки..");
@@ -33,7 +33,15 @@ public class SendQuotationsRequestReceiveRefreshed : ScenarioBase
             }
             else if (msg.IsOfType<MarketDataRequestReject>(MsgType.MARKET_DATA_REQUEST_REJECT, out var mdrr))
             {
-                throw new Exception("Запрос на получение котировок был отклонен с причиной " + mdrr.MDReqRejReason.getValue());
+                var reason = mdrr.MDReqRejReason.getValue();
+                if (reason == MDReqRejReason.UNKNOWN_SYMBOL)
+                {
+                    Logger.LogWarning("На запрос на получение котировок сервер ответил следующими предупреждениями: {warnings}", mdrr.Text.getValue());
+                }
+                else
+                {
+                    throw new Exception($"Запрос на получение котировок был отклонен с причиной {reason}: {mdrr.Text.getValue()}");
+                }
             }
             else if (
                 msg.IsOfType<BusinessMessageReject>(MsgType.BUSINESS_MESSAGE_REJECT, out var bmr)
@@ -70,8 +78,9 @@ public class SendQuotationsRequestReceiveRefreshed : ScenarioBase
             else throw new InvalidOperationException("Unknown MDUpdateAction " + g.MDUpdateAction.getValue());
         }
 
-        Logger.LogInformation(@"Получили обновление котировок: 
+        Logger.LogInformation(@"{date}: Получили обновление котировок: 
 {prices}",
+            DateTime.Now,
             msgs);
     }
 }
