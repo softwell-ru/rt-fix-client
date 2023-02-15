@@ -37,13 +37,13 @@ var builder = Host.CreateDefaultBuilder()
         services.AddSingleton(scenarioSettings);
         AddScenario<SendQuotationsRequestReceiveSnapshots>(services);
         AddScenario<SendQuotationsRequestReceiveRefreshed>(services);
-        AddScenario<SendQuotationsBatchRequestReceiveRefreshedIndefinitely>(services);
         AddScenario<ReceiveDeal>(services);
         AddScenario<SendDealsRequestAndReceiveDeals>(services);
         AddScenario<SendQuotation>(services);
         AddScenario<CancelQuotation>(services);
         AddScenario<ReceiveChats>(services);
         AddScenario<SendChatsRequestAndReceiveChats>(services);
+        AddScenario<SendQuotationsBatchRequestReceiveRefreshedIndefinitely>(services);
     });
 
 using var host = builder.Build();
