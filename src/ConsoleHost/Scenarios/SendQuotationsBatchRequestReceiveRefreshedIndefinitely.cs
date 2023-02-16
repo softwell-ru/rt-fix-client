@@ -102,9 +102,11 @@ public class SendQuotationsBatchRequestReceiveRefreshedIndefinitely : QuotationS
 
             Logger.LogInformation(
                 @"{time}: 
+    Получено сообщений:           {count}
     Скорость получения сообщений: {messages}/сек
     Скорость получения цен:       {prices}/сек",
                 DateTime.Now,
+                messagesCount,
                 messagesCount / secs,
                 pricessCount / secs);
         }
