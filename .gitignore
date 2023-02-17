@@ -54,5 +54,5 @@ nuget_publish.log
 *.log
 store/
 publish/
-SessionSettings.local.cfg
-appsettings.local.json
+SessionSettings.local*.cfg
+appsettings.local*.json

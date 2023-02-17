@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -10,6 +11,8 @@ namespace SoftWell.RtFix.ConsoleHost.Scenarios;
 public class SendQuotationsBatchRequestReceiveRefreshedIndefinitely : QuotationScenarioBase
 {
     private readonly SendQuotationsBatchRequestReceiveRefreshedIndefinitelyOptions _options;
+
+    private readonly ConcurrentQueue<TimeSpan> _latencies = new();
 
     private long _totalRefreshMessagesReceived = 0;
 
@@ -48,10 +51,30 @@ public class SendQuotationsBatchRequestReceiveRefreshedIndefinitely : QuotationS
             {
                 if (msg.IsOfType<MarketDataIncrementalRefresh>(MsgType.MARKET_DATA_INCREMENTAL_REFRESH, out var mdir))
                 {
+                    var length = mdir.NoMDEntries.getValue();
+
                     Interlocked.Increment(ref _totalRefreshMessagesReceived);
-                    Interlocked.Add(ref _totalRefreshPricesReceived, mdir.NoMDEntries.getValue());
+                    Interlocked.Add(ref _totalRefreshPricesReceived, length);
 
                     t ??= LogRefreshMessagesRateAsync(cts.Token);
+
+                    var sendingTime = mdir.Header.GetField(new SendingTime()).getValue();
+
+                    for (var i = 1; i <= length; i++)
+                    {
+                        var g = new MarketDataIncrementalRefresh.NoMDEntriesGroup();
+                        mdir.GetGroup(i, g);
+
+                        var time = g.MDEntryTime.getValue();
+
+                        var ts = new TimeSpan(0, time.Hour, time.Minute, time.Second, time.Millisecond);
+
+                        var entryTime = g.MDEntryDate.getValue().Add(ts);
+
+                        var latency = sendingTime.Subtract(entryTime);
+
+                        _latencies.Enqueue(latency);
+                    }
                 }
                 else if (msg.IsOfType<MarketDataRequestReject>(MsgType.MARKET_DATA_REQUEST_REJECT, out var mdrr))
                 {
@@ -90,6 +113,8 @@ public class SendQuotationsBatchRequestReceiveRefreshedIndefinitely : QuotationS
         await Task.Yield();
         var sw = Stopwatch.StartNew();
 
+        long prevMessagesCount = 0;
+
         while (!ct.IsCancellationRequested)
         {
             await Task.Delay(_options.Interval, ct);
@@ -100,15 +125,47 @@ public class SendQuotationsBatchRequestReceiveRefreshedIndefinitely : QuotationS
             var messagesCount = Interlocked.Read(ref _totalRefreshMessagesReceived);
             var pricessCount = Interlocked.Read(ref _totalRefreshPricesReceived);
 
+            var newMessagesCount = messagesCount - prevMessagesCount;
+
+            prevMessagesCount += newMessagesCount;
+
+            var latencies = GetNewLatencies(newMessagesCount).ToList();
+
+            if (latencies.Count == 0) continue;
+
+            var minMs = latencies.Min(x => x.TotalMilliseconds);
+            var avgMs = latencies.Average(x => x.TotalMilliseconds);
+            var maxMs = latencies.Max(x => x.TotalMilliseconds);
+
+            var minTs = TimeSpan.FromMilliseconds(minMs);
+            var avgTs = TimeSpan.FromMilliseconds(avgMs);
+            var maxTs = TimeSpan.FromMilliseconds(maxMs);
+
             Logger.LogInformation(
                 @"{time}: 
-    Получено сообщений:           {count}
-    Скорость получения сообщений: {messages}/сек
-    Скорость получения цен:       {prices}/сек",
+    Получено сообщений:                      {count}
+    Скорость получения сообщений:            {messages}/сек
+    Скорость получения цен:                  {prices}/сек
+    Задержка времени цены и отправки сервером:
+        min: {minLatency}
+        avg: {avgLatency}
+        max: {maxLatency}",
                 DateTime.Now,
                 messagesCount,
                 messagesCount / secs,
-                pricessCount / secs);
+                pricessCount / secs,
+                minTs,
+                avgTs,
+                maxTs);
+        }
+    }
+
+    private IEnumerable<TimeSpan> GetNewLatencies(long maxCount)
+    {
+        for (long i = 0; i <= maxCount; i++)
+        {
+            if (!_latencies.TryDequeue(out var ts)) yield break;
+            yield return ts;
         }
     }
 }
