@@ -93,6 +93,29 @@ public static class Helpers
         return msg;
     }
 
+    public static SecurityListRequest CreateSecListRequest()
+    {
+        var msg = new SecurityListRequest
+        {
+            SecurityReqID = new SecurityReqID(Guid.NewGuid().ToString()),
+            SecurityListRequestType = new SecurityListRequestType(SecurityListRequestType.ALL_SECURITIES)
+        };
+
+        return msg;
+    }
+
+    public static SecurityListRequest CreateSecListSymbolRequest(string symbol)
+    {
+        var msg = new SecurityListRequest
+        {
+            SecurityReqID = new SecurityReqID(Guid.NewGuid().ToString()),
+            SecurityListRequestType = new SecurityListRequestType(SecurityListRequestType.SYMBOL),
+            Symbol = new Symbol(symbol)
+        };
+
+        return msg;
+    }
+
     public static Quote CreateQuote(
         string securityId,
         decimal? bid,

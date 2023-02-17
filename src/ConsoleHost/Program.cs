@@ -35,6 +35,8 @@ var builder = Host.CreateDefaultBuilder()
         AddScenario<CancelQuotation>(services);
         AddScenario<ReceiveChats>(services);
         AddScenario<SendChatsRequestAndReceiveChats>(services);
+        AddScenario<SendSecListRequestAndReceiveSecList>(services);
+        AddScenario<SendSecListRequestAndReceiveSecDefinition>(services);
     });
 
 using var host = builder.Build();
