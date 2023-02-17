@@ -114,6 +114,7 @@ public class SendQuotationsBatchRequestReceiveRefreshedIndefinitely : QuotationS
         var sw = Stopwatch.StartNew();
 
         long prevMessagesCount = 0;
+        long prevPricesCount = 0;
 
         while (!ct.IsCancellationRequested)
         {
@@ -123,19 +124,25 @@ public class SendQuotationsBatchRequestReceiveRefreshedIndefinitely : QuotationS
 
             // мало ли, кто-то еще сидит на 32-разрядной ОС..
             var messagesCount = Interlocked.Read(ref _totalRefreshMessagesReceived);
-            var pricessCount = Interlocked.Read(ref _totalRefreshPricesReceived);
+            var pricesCount = Interlocked.Read(ref _totalRefreshPricesReceived);
 
             var newMessagesCount = messagesCount - prevMessagesCount;
+            var newPricesCount = pricesCount - prevPricesCount;
 
             prevMessagesCount += newMessagesCount;
+            prevPricesCount += newPricesCount;
 
-            var latencies = GetNewLatencies(newMessagesCount).ToList();
+            var latencies = GetNewLatencies(newPricesCount).ToList();
 
-            if (latencies.Count == 0) continue;
+            double minMs, avgMs, maxMs;
+            minMs = avgMs = maxMs = 0;
 
-            var minMs = latencies.Min(x => x.TotalMilliseconds);
-            var avgMs = latencies.Average(x => x.TotalMilliseconds);
-            var maxMs = latencies.Max(x => x.TotalMilliseconds);
+            if (latencies.Count > 0)
+            {
+                minMs = latencies.Min(x => x.TotalMilliseconds);
+                avgMs = latencies.Average(x => x.TotalMilliseconds);
+                maxMs = latencies.Max(x => x.TotalMilliseconds);
+            }
 
             var minTs = TimeSpan.FromMilliseconds(minMs);
             var avgTs = TimeSpan.FromMilliseconds(avgMs);
@@ -143,17 +150,23 @@ public class SendQuotationsBatchRequestReceiveRefreshedIndefinitely : QuotationS
 
             Logger.LogInformation(
                 @"{time}: 
-    Получено сообщений:                      {count}
-    Скорость получения сообщений:            {messages}/сек
-    Скорость получения цен:                  {prices}/сек
+    Получено сообщений всего:           {count}
+    Получено сообщений с прошлого лога: {newCount}
+    Скорость получения сообщений:       {messages}/сек
+    Получено цен всего:                 {pricesCount}
+    Получено цен с прошлого лога:       {newPricesCount}
+    Скорость получения цен:             {prices}/сек
     Задержка времени цены и отправки сервером:
         min: {minLatency}
         avg: {avgLatency}
         max: {maxLatency}",
                 DateTime.Now,
                 messagesCount,
+                newMessagesCount,
                 messagesCount / secs,
-                pricessCount / secs,
+                pricesCount,
+                newPricesCount,
+                pricesCount / secs,
                 minTs,
                 avgTs,
                 maxTs);
