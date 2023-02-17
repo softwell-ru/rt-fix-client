@@ -15,9 +15,14 @@ public abstract class QuotationScenarioBase : ScenarioBase
 
     protected void SubscribeToRefreshes(ScenarioContext context)
     {
-        var quotationsRequest = Helpers.CreateQuotationRequest(new[] { QuotationSecurityId }, null);
+        SubscribeToRefreshes(context, QuotationSecurityId);
+    }
+
+    protected void SubscribeToRefreshes(ScenarioContext context, string quotationSecurityId)
+    {
+        var quotationsRequest = Helpers.CreateQuotationRequest(new[] { quotationSecurityId }, null);
         context.Client.SendMessage(quotationsRequest);
-        Logger.LogInformation("Отправили подписку на котировку..");
+        Logger.LogInformation("Отправили подписку на котировку {QuotationSecurityId}..", quotationSecurityId);
     }
 
     protected async Task<MarketDataSnapshotFullRefresh> WaitForSnapshotFullRefreshAsync(ScenarioContext context, CancellationToken ct)

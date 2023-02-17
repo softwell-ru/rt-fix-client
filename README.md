@@ -44,6 +44,10 @@ dotnet run [arguments]
 
 Отправить запрос на котировки, получить текущие значения
 
+#### SendQuotationsBatchRequestReceiveRefreshedIndefinitely
+
+Отправить запрос на батч котировки, получать обновления бесконечно и выписывать среднее количество поступивших обновлений и цен в них в секунду. Требует в appsettings.json секцию SendQuotationsBatchRequestReceiveRefreshedIndefinitely со списком инструментов и, опционально, контрагентов.
+
 #### SendQuotation
 
 Отправить котировку, дождаться сообщения с измененными ценами
