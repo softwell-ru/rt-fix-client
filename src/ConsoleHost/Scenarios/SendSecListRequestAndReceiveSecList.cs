@@ -41,7 +41,7 @@ public class SendSecListRequestAndReceiveSecList : ScenarioBase
 
     private void LogSecurityResponse(SecurityList sl)
     {
-        Logger.LogInformation(@"Получили сообщение о списке инструментов: {fpml}",
-            sl.SecurityReqID.getValue());//TODO: find xml field
+        Logger.LogInformation(@"Получили сообщение о списке инструментов в количестве: {number}",
+            sl.NoRelatedSym.getValue());
     }
 }
