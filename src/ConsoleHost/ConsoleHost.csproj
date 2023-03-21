@@ -25,7 +25,7 @@
     <None Include="appsettings.json" Condition="Exists('appsettings.json')">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="appsettings.local.json" Condition="Exists('appsettings.local.json')">
+    <None Include="appsettings.local.json" Condition="Exists('appsettings.local.json') and '$(Configuration)' == 'Debug'">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="FIXT11.xml" Condition="Exists('FIXT11.xml')">
@@ -37,7 +37,7 @@
     <None Include="SessionSettings.cfg" Condition="Exists('SessionSettings.cfg')">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="SessionSettings.local.cfg" Condition="Exists('SessionSettings.local.cfg')">
+    <None Include="SessionSettings.local.cfg" Condition="Exists('SessionSettings.local.cfg') and '$(Configuration)' == 'Debug'">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
