@@ -63,3 +63,11 @@ dotnet run [arguments]
 #### SendChatsRequestAndReceiveChats
 
 Отправить запрос на чаты за вчера и сегодня, получить подтверждение запроса, получить сообщения из чатов
+
+#### SendSecListRequestAndReceiveSecList
+
+Отправить запрос на списки инструментов, получить подтверждение запроса, получить списки
+
+#### SendSecListRequestAndReceiveSecDefinition
+
+Отправить запрос на данные по инструменту, получить подтверждение запроса, получить данные
