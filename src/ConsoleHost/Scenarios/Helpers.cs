@@ -40,6 +40,11 @@ public static class Helpers
             MDEntryType = new MDEntryType(MDEntryType.OFFER)
         });
 
+        msg.AddGroup(new MarketDataRequest.NoMDEntryTypesGroup
+        {
+            MDEntryType = new MDEntryType(MDEntryType.TRADE)
+        });
+
         foreach (var sId in sIds)
         {
             msg.AddGroup(new MarketDataRequest.NoRelatedSymGroup
