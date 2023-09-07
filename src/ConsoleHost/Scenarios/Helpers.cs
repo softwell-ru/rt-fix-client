@@ -40,6 +40,11 @@ public static class Helpers
             MDEntryType = new MDEntryType(MDEntryType.OFFER)
         });
 
+        msg.AddGroup(new MarketDataRequest.NoMDEntryTypesGroup
+        {
+            MDEntryType = new MDEntryType(MDEntryType.TRADE)
+        });
+
         foreach (var sId in sIds)
         {
             msg.AddGroup(new MarketDataRequest.NoRelatedSymGroup
@@ -89,6 +94,29 @@ public static class Helpers
                 TradeDate = new TradeDate(maxDate.Value.ToString("yyyyMMdd"))
             });
         }
+
+        return msg;
+    }
+
+    public static SecurityListRequest CreateSecListRequest()
+    {
+        var msg = new SecurityListRequest
+        {
+            SecurityReqID = new SecurityReqID(Guid.NewGuid().ToString()),
+            SecurityListRequestType = new SecurityListRequestType(SecurityListRequestType.ALL_SECURITIES)
+        };
+
+        return msg;
+    }
+
+    public static SecurityListRequest CreateSecListSymbolRequest(string symbol)
+    {
+        var msg = new SecurityListRequest
+        {
+            SecurityReqID = new SecurityReqID(Guid.NewGuid().ToString()),
+            SecurityListRequestType = new SecurityListRequestType(SecurityListRequestType.SYMBOL),
+            Symbol = new Symbol(symbol)
+        };
 
         return msg;
     }

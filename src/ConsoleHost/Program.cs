@@ -28,8 +28,13 @@ var builder = Host.CreateDefaultBuilder()
     .ConfigureServices((host, services) =>
     {
         services.AddLogging(
-            o => o.AddConsole()
-                .SetMinimumLevel(LogLevel.Debug));
+            lb => lb.AddSimpleConsole(
+                opts =>
+                {
+                    opts.IncludeScopes = true;
+                    opts.TimestampFormat = "HH:mm:ss ";
+                })
+            .SetMinimumLevel(LogLevel.Debug));
 
         services.AddOptions<SendQuotationsBatchRequestReceiveRefreshedIndefinitelyOptions>()
             .Bind(host.Configuration.GetSection(nameof(SendQuotationsBatchRequestReceiveRefreshedIndefinitely)));
@@ -43,6 +48,8 @@ var builder = Host.CreateDefaultBuilder()
         AddScenario<CancelQuotation>(services);
         AddScenario<ReceiveChats>(services);
         AddScenario<SendChatsRequestAndReceiveChats>(services);
+        AddScenario<SendSecListRequestAndReceiveSecList>(services);
+        AddScenario<SendSecListRequestAndReceiveSecDefinition>(services);
         AddScenario<SendQuotationsBatchRequestReceiveRefreshedIndefinitely>(services);
     });
 
