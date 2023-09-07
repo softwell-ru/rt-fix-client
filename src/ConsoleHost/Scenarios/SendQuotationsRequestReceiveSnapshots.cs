@@ -86,9 +86,12 @@ public class SendQuotationsRequestReceiveSnapshots : QuotationScenarioBase
             prices.Add($"{g.MDEntryType.getValue()}: {g.MDEntryPx.getValue()}, PartyId={pg.PartyID.getValue()}");
         }
 
+        var unitOfMeasure = mds.IsSetUnitOfMeasure() ? mds.UnitOfMeasure.getValue() : null;
+
         Logger.LogInformation(@"Получили котировку по инструменту {securityId}: 
-{prices}",
+{prices}, unit of measure: {unitOfMeasure}",
             mds.SecurityID.getValue(),
-            prices);
+            prices,
+            unitOfMeasure);
     }
 }
