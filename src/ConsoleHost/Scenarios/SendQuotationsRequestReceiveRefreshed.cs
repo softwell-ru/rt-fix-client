@@ -69,7 +69,8 @@ public class SendQuotationsRequestReceiveRefreshed : QuotationScenarioBase
 
             if (g.MDUpdateAction.getValue() == MDUpdateAction.NEW)
             {
-                msgs.Add($"инструмент {g.SecurityID.getValue()} NEW {g.MDEntryType.getValue()}: {g.MDEntryPx.getValue()}, PartyId={pg.PartyID.getValue()}");
+                var unitOfMeasure = g.IsSetUnitOfMeasure() ? g.UnitOfMeasure.getValue() : null;
+                msgs.Add($"инструмент {g.SecurityID.getValue()} NEW {g.MDEntryType.getValue()}: {g.MDEntryPx.getValue()}, PartyId={pg.PartyID.getValue()}, unit of measure: {unitOfMeasure}");
             }
             else if (g.MDUpdateAction.getValue() == MDUpdateAction.DELETE)
             {
