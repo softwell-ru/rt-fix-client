@@ -100,6 +100,7 @@
       <field name='SecurityResponseID' required='N' />
       <field name='SecurityRequestResult' required='N' />
       <field name='TotNoRelatedSym' required='N' />
+      <field name='UnitOfMeasure' required='N' />
       <component name='SecListGrp' required='N' />
     </message>
 
