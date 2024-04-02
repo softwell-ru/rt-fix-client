@@ -1,5 +1,6 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
+        <LangVersion>latest</LangVersion>
         <Company>SoftWell</Company>
         <Authors>$(Company)</Authors>
         <Owners>$(Company)</Owners>
@@ -7,6 +8,6 @@
         <RepositoryUrl>https://github.com/softwell-ru/rt-fix-client</RepositoryUrl>
         <Nullable>enable</Nullable>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-        <Version>1.0.11</Version>
+        <Version>7.4.0</Version>
     </PropertyGroup>
 </Project>
