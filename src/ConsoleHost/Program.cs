@@ -51,6 +51,8 @@ var builder = Host.CreateDefaultBuilder()
         AddScenario<SendSecListRequestAndReceiveSecList>(services);
         AddScenario<SendSecListRequestAndReceiveSecDefinition>(services);
         AddScenario<SendQuotationsBatchRequestReceiveRefreshedIndefinitely>(services);
+        AddScenario<SendQuotationForCurvePoints>(services);
+        AddScenario<CancelQuotationForCurvePoints>(services);
     });
 
 using var host = builder.Build();
