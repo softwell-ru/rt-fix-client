@@ -148,6 +148,7 @@
 
     <message name='QuoteCancel' msgcat='app' msgtype='Z'>
       <component name='QuotCxlEntriesGrp' required='Y' />
+      <component name='Parties' required='N' />
       <field name='QuoteMsgID' required='Y' />
     </message>
 
