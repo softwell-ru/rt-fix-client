@@ -8,6 +8,7 @@
       <field name='BidPx' required='N' />
       <field name='OfferPx' required='N' />
       <component name='Instrument' required='Y' />
+      <component name='Parties' required='N' />
     </message>
     <message name='MarketDataRequest' msgcat='app' msgtype='V'>
       <field name='MDReqID' required='Y' />
@@ -147,6 +148,7 @@
 
     <message name='QuoteCancel' msgcat='app' msgtype='Z'>
       <component name='QuotCxlEntriesGrp' required='Y' />
+      <component name='Parties' required='N' />
       <field name='QuoteMsgID' required='Y' />
     </message>
 
