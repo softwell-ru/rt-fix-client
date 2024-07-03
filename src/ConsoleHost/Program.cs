@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using QuickFix;
+using QuickFix.FIX50SP2;
 using SoftWell.RtFix.ConsoleHost.Scenarios;
 using SoftWell.RtFix.ConsoleHost.Scenarios.Infrastructure;
 
@@ -53,6 +54,9 @@ var builder = Host.CreateDefaultBuilder()
         AddScenario<SendQuotationsBatchRequestReceiveRefreshedIndefinitely>(services);
         AddScenario<SendQuotationForCurvePoints>(services);
         AddScenario<CancelQuotationForCurvePoints>(services);
+        AddScenario<SendMassQuoteWithoutParty>(services);
+        AddScenario<SendMassQuoteWithParty>(services);
+        AddScenario<CancelMassQuote>(services);
     });
 
 using var host = builder.Build();

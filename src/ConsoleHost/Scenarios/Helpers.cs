@@ -72,6 +72,78 @@ public static class Helpers
         return msg;
     }
 
+    public static MassQuote MassQuoteRequest(
+        string securityId,
+        string? partyId)
+    {
+        ArgumentNullException.ThrowIfNull(securityId);
+
+        var msg = new MassQuote
+        {
+            QuoteID = new QuoteID(Guid.NewGuid().ToString()),
+            QuoteType = new QuoteType(QuoteType.TRADEABLE),
+        };
+
+        var quoteSetGrp = new MassQuote.NoQuoteSetsGroup
+        {
+            QuoteSetID = new QuoteSetID("1"),
+            TotNoQuoteEntries = new TotNoQuoteEntries(3)
+
+        };
+
+        var quoteEntryGrpFirst = new MassQuote.NoQuoteSetsGroup.NoQuoteEntriesGroup
+        {
+            QuoteEntryID = new QuoteEntryID(Guid.NewGuid().ToString()),
+            SecurityID = new SecurityID(securityId),
+            SecurityIDSource = new SecurityIDSource(_hihiClubSecuritySourceId),
+            BidPx = new BidPx(90m),
+            OfferPx = new OfferPx(90m),
+            BidSize = new BidSize(1000),
+            OfferSize = new OfferSize(1000)
+        };
+
+        var quoteEntryGrpSecond = new MassQuote.NoQuoteSetsGroup.NoQuoteEntriesGroup
+        {
+            QuoteEntryID = new QuoteEntryID(Guid.NewGuid().ToString()),
+            SecurityID = new SecurityID(securityId),
+            SecurityIDSource = new SecurityIDSource(_hihiClubSecuritySourceId),
+            BidPx = new BidPx(90m),
+            OfferPx = new OfferPx(90m),
+            BidSize = new BidSize(3000),
+            OfferSize = new OfferSize(3000)
+        };
+
+
+        var quoteEntryGrpThirst = new MassQuote.NoQuoteSetsGroup.NoQuoteEntriesGroup
+        {
+            QuoteEntryID = new QuoteEntryID(Guid.NewGuid().ToString()),
+            SecurityID = new SecurityID(securityId),
+            SecurityIDSource = new SecurityIDSource(_hihiClubSecuritySourceId),
+            BidPx = new BidPx(90m),
+            OfferPx = new OfferPx(90m),
+            BidSize = new BidSize(5000),
+            OfferSize = new OfferSize(5000)
+        };
+
+        quoteSetGrp.AddGroup(quoteEntryGrpFirst);
+        quoteSetGrp.AddGroup(quoteEntryGrpSecond);
+        quoteSetGrp.AddGroup(quoteEntryGrpThirst);
+        msg.AddGroup(quoteSetGrp);
+
+
+        if (partyId != null)
+        {
+            msg.NoPartyIDs = new NoPartyIDs(1);
+            msg.AddGroup(new MarketDataRequest.NoPartyIDsGroup
+            {
+                PartyID = new PartyID(partyId),
+                PartyIDSource = new PartyIDSource(PartyIDSource.PROPRIETARY_CUSTOM_CODE)
+            });
+        }
+
+        return msg;
+    }
+
     public static TradeCaptureReportRequest CreateDealsReportRequest(DateTime minDate, DateTime? maxDate)
     {
         var msg = new TradeCaptureReportRequest
