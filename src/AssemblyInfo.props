@@ -1,4 +1,5 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Import Project="..\Version.props" />
     <PropertyGroup>
         <LangVersion>latest</LangVersion>
         <Company>SoftWell</Company>
@@ -8,6 +9,6 @@
         <RepositoryUrl>https://github.com/softwell-ru/rt-fix-client</RepositoryUrl>
         <Nullable>enable</Nullable>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-        <Version>7.4.0</Version>
+        <Version>7.4.0.1</Version>
     </PropertyGroup>
 </Project>
