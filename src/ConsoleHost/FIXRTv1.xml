@@ -155,13 +155,13 @@
             <component name='PartyInfo' required='N' />
             <field name='ChatsRequestID' required='N' />
         </message>
-
+      
         <message name='QuoteCancel' msgcat='app' msgtype='Z'>
             <component name='QuotCxlEntriesGrp' required='Y' />
             <component name='Parties' required='N' />
             <field name='QuoteType' required='N' />
             <field name='QuoteMsgID' required='Y' />
-        </message>
+      </message>
 
         <message name='ExecutionReport' msgcat='app' msgtype='8'>
             <field name='ClOrdID' required='Y' />
