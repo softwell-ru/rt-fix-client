@@ -114,7 +114,7 @@ public static class Helpers
         };
 
 
-        var quoteEntryGrpThirst = new MassQuote.NoQuoteSetsGroup.NoQuoteEntriesGroup
+        var quoteEntryGrpThird = new MassQuote.NoQuoteSetsGroup.NoQuoteEntriesGroup
         {
             QuoteEntryID = new QuoteEntryID(Guid.NewGuid().ToString()),
             SecurityID = new SecurityID(securityId),
@@ -127,7 +127,7 @@ public static class Helpers
 
         quoteSetGrp.AddGroup(quoteEntryGrpFirst);
         quoteSetGrp.AddGroup(quoteEntryGrpSecond);
-        quoteSetGrp.AddGroup(quoteEntryGrpThirst);
+        quoteSetGrp.AddGroup(quoteEntryGrpThird);
         msg.AddGroup(quoteSetGrp);
 
 
