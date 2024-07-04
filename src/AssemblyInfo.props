@@ -9,6 +9,5 @@
         <RepositoryUrl>https://github.com/softwell-ru/rt-fix-client</RepositoryUrl>
         <Nullable>enable</Nullable>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-        <Version>7.4.0.1</Version>
     </PropertyGroup>
 </Project>
