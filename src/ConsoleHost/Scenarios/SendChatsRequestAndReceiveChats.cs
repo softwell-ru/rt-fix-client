@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using QuickFix;
 using QuickFix.Fields;
 using SoftWell.RtFix.ConsoleHost.Scenarios.Infrastructure;
 
