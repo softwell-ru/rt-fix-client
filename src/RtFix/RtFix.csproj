@@ -10,8 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="QuickFIXn.Core" Version="1.10.0" />
-    <PackageReference Include="QuickFIXn.FIX5.0SP2" Version="1.10.0" />
+    <PackageReference Include="SoftWell.Fix" Version="7.4.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.1" />
   </ItemGroup>
 

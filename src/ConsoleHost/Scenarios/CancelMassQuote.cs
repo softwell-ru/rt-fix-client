@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using QuickFix;
 using QuickFix.Fields;
 using QuickFix.FIX50SP2;
 using SoftWell.RtFix.ConsoleHost.Scenarios.Infrastructure;
@@ -19,18 +20,18 @@ public class CancelMassQuote : QuotationScenarioBase
 
     protected override string QuotationSecurityId => "RUB1WD=";
 
-    private static readonly string partyId = "RU";
+    private static readonly string _partyId = "RU";
 
     protected override async Task RunAsyncInner(ScenarioContext context, CancellationToken ct)
     {
-        var message = Helpers.MassQuoteRequest(QuotationSecurityId, partyId);
+        var message = Helpers.MassQuoteRequest(QuotationSecurityId, _partyId);
 
         var cancelBand = Helpers.CreateQuoteCancel(QuotationSecurityId);
         //Указываем, что отменяем торгуемые цены, чтобы отменять банды.
         cancelBand.QuoteType = new QuoteType(QuoteType.TRADEABLE);
         cancelBand.AddGroup(new QuoteCancel.NoPartyIDsGroup
         {
-            PartyID = new PartyID(partyId)
+            PartyID = new PartyID(_partyId)
         });
 
         context.Client.SendMessage(message);

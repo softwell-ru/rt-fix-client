@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using QuickFix;
 using QuickFix.Fields;
 using QuickFix.FIX50SP2;
 using SoftWell.RtFix.ConsoleHost.Scenarios.Infrastructure;
@@ -45,7 +46,8 @@ public class SendSecListRequestAndReceiveSecDefinition : ScenarioBase
     {
         var group = new SecurityList.NoRelatedSymGroup();
         var field = new Symbol();
+        sl.GetGroup(1, group);
         Logger.LogInformation(@"Получили сообщение об инструменте: {securityId}",
-            sl.GetGroup(1, group).GetField(field).getValue());
+            group.GetField(field).getValue());
     }
 }
