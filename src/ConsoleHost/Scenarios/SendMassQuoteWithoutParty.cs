@@ -8,21 +8,28 @@ namespace SoftWell.RtFix.ConsoleHost.Scenarios;
 
 public class SendMassQuoteWithoutParty : QuotationScenarioBase
 {
+    private readonly OperationOptions _options;
+
     public SendMassQuoteWithoutParty(
         ScenarioSettings settings,
+        ConfigManager configManager,
         ILoggerFactory loggerFactory) : base(settings, loggerFactory)
     {
+        ArgumentNullException.ThrowIfNull(configManager);
+
+        _options = configManager.GetOperationSettings("CommonSettings")
+                   ?? throw new InvalidOperationException("Common settings are not configured.");
+
+        if (_options.QuotationSecurityId is null) throw new ArgumentException("QuotationSecurityId should be present in configuration");
     }
 
     public override string Name => nameof(SendMassQuoteWithoutParty);
 
     public override string? Description => $"Отправить MassQuote без кода режима торгов";
 
-    protected override string QuotationSecurityId => "RUB1WD=";
-
     protected override async Task RunAsyncInner(ScenarioContext context, CancellationToken ct)
     {
-        var request = Helpers.MassQuoteRequest(QuotationSecurityId, null);
+        var request = Helpers.MassQuoteRequest(_options.QuotationSecurityId, null);
 
         context.Client.SendMessage(request);
 

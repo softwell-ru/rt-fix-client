@@ -37,10 +37,35 @@ var builder = Host.CreateDefaultBuilder()
                 })
             .SetMinimumLevel(LogLevel.Debug));
 
-        services.AddOptions<SendQuotationsBatchRequestReceiveRefreshedIndefinitelyOptions>()
-            .Bind(host.Configuration.GetSection(nameof(SendQuotationsBatchRequestReceiveRefreshedIndefinitely)));
+        var operationNames = new[]
+               {
+            "SendQuotationForCurvePoints",
+            "CancelMassQuote",
+            "SendMassQuoteWithoutParty",
+            "SendMassQuoteWithParty",
+            "SendQuotationsBatchRequestReceiveRefreshedIndefinitely",
+            "SendSecListRequestAndReceiveSecDefinition"
+        };
+
+        foreach (var operationName in operationNames)
+        {
+            services.AddOptions<OperationOptions>(operationName)
+                .Configure<IConfiguration>((settings, configuration) =>
+                {
+                    var settingsManager = new ConfigManager(configuration);
+                    var operationSettings = settingsManager.GetOperationSettings(operationName);
+
+                    settings.PartyId = operationSettings.PartyId;
+                    settings.QuotationSecurityId = operationSettings.QuotationSecurityId;
+                    settings.CurveCode = operationSettings.CurveCode;
+                    settings.SecurityIds = operationSettings.SecurityIds;
+                    settings.Interval = operationSettings.Interval;
+                });
+        }
 
         services.AddSingleton(scenarioSettings);
+
+        services.AddSingleton<ConfigManager>();
         AddScenario<SendQuotationsRequestReceiveSnapshots>(services);
         AddScenario<SendQuotationsRequestReceiveRefreshed>(services);
         AddScenario<ReceiveDeal>(services);

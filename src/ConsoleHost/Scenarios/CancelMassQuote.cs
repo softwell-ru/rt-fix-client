@@ -8,30 +8,35 @@ namespace SoftWell.RtFix.ConsoleHost.Scenarios;
 
 public class CancelMassQuote : QuotationScenarioBase
 {
+    private readonly OperationOptions _options;
+
     public CancelMassQuote(
         ScenarioSettings settings,
+        ConfigManager configManager,
         ILoggerFactory loggerFactory) : base(settings, loggerFactory)
     {
+        ArgumentNullException.ThrowIfNull(configManager);
+
+        _options = configManager.GetOperationSettings("CommonSettings")
+            ?? throw new InvalidOperationException("CommonSettings settings are not configured.");
+
+        if (_options.QuotationSecurityId is null) throw new ArgumentNullException("QuotationSecurityId should be present in configuration");
     }
 
     public override string Name => nameof(CancelMassQuote);
 
     public override string? Description => $"Отменить MassQuote котировку, дождаться сообщения об отмене";
 
-    protected override string QuotationSecurityId => "RUB1WD=";
-
-    private static readonly string _partyId = "RU";
-
     protected override async Task RunAsyncInner(ScenarioContext context, CancellationToken ct)
     {
-        var message = Helpers.MassQuoteRequest(QuotationSecurityId, _partyId);
+        var message = Helpers.MassQuoteRequest(_options.QuotationSecurityId, _options.PartyId);
 
-        var cancelBand = Helpers.CreateQuoteCancel(QuotationSecurityId);
+        var cancelBand = Helpers.CreateQuoteCancel(_options.QuotationSecurityId);
         //Указываем, что отменяем торгуемые цены, чтобы отменять банды.
         cancelBand.QuoteType = new QuoteType(QuoteType.TRADEABLE);
         cancelBand.AddGroup(new QuoteCancel.NoPartyIDsGroup
         {
-            PartyID = new PartyID(_partyId)
+            PartyID = new PartyID(_options.PartyId)
         });
 
         context.Client.SendMessage(message);

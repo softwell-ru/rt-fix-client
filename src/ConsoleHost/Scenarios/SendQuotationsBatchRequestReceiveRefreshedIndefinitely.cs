@@ -11,7 +11,7 @@ namespace SoftWell.RtFix.ConsoleHost.Scenarios;
 
 public class SendQuotationsBatchRequestReceiveRefreshedIndefinitely : QuotationScenarioBase
 {
-    private readonly SendQuotationsBatchRequestReceiveRefreshedIndefinitelyOptions _options;
+    private readonly OperationOptions _options;
 
     private readonly ConcurrentQueue<TimeSpan> _latencies = new();
 
@@ -20,16 +20,16 @@ public class SendQuotationsBatchRequestReceiveRefreshedIndefinitely : QuotationS
     private long _totalRefreshPricesReceived = 0;
 
     public SendQuotationsBatchRequestReceiveRefreshedIndefinitely(
-        ScenarioSettings settings,
-        IOptions<SendQuotationsBatchRequestReceiveRefreshedIndefinitelyOptions> options,
-        ILoggerFactory loggerFactory) : base(settings, loggerFactory)
+         ScenarioSettings settings,
+         ConfigManager configManager,
+         ILoggerFactory loggerFactory) : base(settings, loggerFactory)
     {
-        ArgumentNullException.ThrowIfNull(options);
+        ArgumentNullException.ThrowIfNull(configManager);
 
-        if (options.Value is null) throw new ArgumentException("Scenario options should be present in configuration");
-        if (options.Value.SecurityIds?.Any() != true) throw new ArgumentException("SecurityIds should be present in scenario options");
+        _options = configManager.GetOperationSettings("SendQuotationsBatchRequestReceiveRefreshedIndefinitely")
+                   ?? throw new InvalidOperationException("SendQuotationsBatchRequestReceiveRefreshedIndefinitely settings are not configured.");
 
-        _options = options.Value;
+        if (_options.SecurityIds?.Any() != true) throw new ArgumentException("SecurityIds should be present in scenario options");
     }
 
     public override string Name => nameof(SendQuotationsBatchRequestReceiveRefreshedIndefinitely);

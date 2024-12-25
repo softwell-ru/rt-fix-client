@@ -8,17 +8,22 @@ namespace SoftWell.RtFix.ConsoleHost.Scenarios;
 
 public class CancelQuotationForCurvePoints : QuotationScenarioBase
 {
-    private static string _curveCode = "SOFTWELL-RUB-ADMIN-380";
+    private readonly OperationOptions _options;
 
     public CancelQuotationForCurvePoints(
         ScenarioSettings settings,
+        ConfigManager configManager,
         ILoggerFactory loggerFactory) : base(settings, loggerFactory)
     {
+        ArgumentNullException.ThrowIfNull(configManager);
+
+        _options = configManager.GetOperationSettings("SendQuotationForCurvePoints")
+                   ?? throw new ArgumentException("SendQuotationForCurvePoints settings are not configured.");
+
+        if (_options.QuotationSecurityId is null) throw new ArgumentException("QuotationSecurityId should be present in configuration");
     }
 
     public override string Name => nameof(CancelQuotationForCurvePoints);
-
-    protected override string QuotationSecurityId => "RUB1WD=";
 
     public override string? Description => $"Отменить котировку, дождаться сообщения об отмене";
 
@@ -27,11 +32,11 @@ public class CancelQuotationForCurvePoints : QuotationScenarioBase
         SubscribeToRefreshes(context);
         await WaitForSnapshotFullRefreshAsync(context, ct);
 
-        var valuesRequest = Helpers.CreateQuote(QuotationSecurityId, 7.37m, 8.74m);
+        var valuesRequest = Helpers.CreateQuote(_options.QuotationSecurityId, 7.37m, 8.74m);
 
         valuesRequest.AddGroup(new MarketDataRequest.NoPartyIDsGroup
         {
-            PartyID = new PartyID(_curveCode)
+            PartyID = new PartyID(_options.CurveCode)
         });
 
         context.Client.SendMessage(valuesRequest);
@@ -42,7 +47,7 @@ public class CancelQuotationForCurvePoints : QuotationScenarioBase
 
         request.AddGroup(new MarketDataRequest.NoPartyIDsGroup
         {
-            PartyID = new PartyID(_curveCode)
+            PartyID = new PartyID(_options.CurveCode)
         });
         context.Client.SendMessage(request);
 
@@ -59,7 +64,7 @@ public class CancelQuotationForCurvePoints : QuotationScenarioBase
                 foreach (var g in EnumerateMDEntriesGroups(mdir))
                 {
                     if (g.MDUpdateAction.getValue() == MDUpdateAction.DELETE
-                        && g.SecurityID.getValue() == QuotationSecurityId)
+                        && g.SecurityID.getValue() == _options.QuotationSecurityId)
                     {
                         var type = g.MDEntryType.getValue();
 
@@ -75,7 +80,7 @@ public class CancelQuotationForCurvePoints : QuotationScenarioBase
                         var pg = new MarketDataSnapshotFullRefresh.NoMDEntriesGroup.NoPartyIDsGroup();
                         g.GetGroup(1, pg);
 
-                        if (pg.PartyID.getValue() == _curveCode)
+                        if (pg.PartyID.getValue() == _options.CurveCode)
                         {
                             isOurPartyId = true;
                         }

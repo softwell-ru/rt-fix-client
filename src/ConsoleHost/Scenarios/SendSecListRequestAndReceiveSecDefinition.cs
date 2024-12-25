@@ -8,12 +8,17 @@ namespace SoftWell.RtFix.ConsoleHost.Scenarios;
 
 public class SendSecListRequestAndReceiveSecDefinition : ScenarioBase
 {
-    private readonly string _securityId = "FX-USD-RUB-TOM";
+    private readonly OperationOptions _options;
 
     public SendSecListRequestAndReceiveSecDefinition(
         ScenarioSettings settings,
+        ConfigManager configManager,
         ILoggerFactory loggerFactory) : base(settings, loggerFactory)
     {
+        ArgumentNullException.ThrowIfNull(configManager);
+
+        _options = configManager.GetOperationSettings("SendSecListRequestAndReceiveSecDefinition")
+                   ?? throw new InvalidOperationException("SendSecListRequestAndReceiveSecDefinition settings are not configured.");
     }
 
     public override string Name => nameof(SendSecListRequestAndReceiveSecDefinition);
@@ -22,7 +27,7 @@ public class SendSecListRequestAndReceiveSecDefinition : ScenarioBase
 
     protected override async Task RunAsyncInner(ScenarioContext context, CancellationToken ct)
     {
-        var request = Helpers.CreateSecListSymbolRequest(_securityId);
+        var request = Helpers.CreateSecListSymbolRequest(_options.SecurityId);
 
         context.Client.SendMessage(request);
 

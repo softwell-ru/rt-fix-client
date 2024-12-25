@@ -8,10 +8,19 @@ namespace SoftWell.RtFix.ConsoleHost.Scenarios;
 
 public class SendQuotationsRequestReceiveSnapshots : QuotationScenarioBase
 {
+    private readonly OperationOptions _options;
+
     public SendQuotationsRequestReceiveSnapshots(
         ScenarioSettings settings,
+        ConfigManager configManager,
         ILoggerFactory loggerFactory) : base(settings, loggerFactory)
     {
+        ArgumentNullException.ThrowIfNull(configManager);
+
+        _options = configManager.GetOperationSettings("CommonSettings")
+            ?? throw new InvalidOperationException("CommonSettings settings are not configured.");
+
+        if (_options.SecurityId is null) throw new ArgumentException("SecurityId should be present in configuration");
     }
 
     public override string Name => nameof(SendQuotationsRequestReceiveSnapshots);
@@ -23,7 +32,7 @@ public class SendQuotationsRequestReceiveSnapshots : QuotationScenarioBase
         var count = 0;
         var totalCount = 0;
 
-        var request = Helpers.CreateQuotationRequest(new[] { "FX-USD-RUB-TOM" }, null);
+        var request = Helpers.CreateQuotationRequest(new[] { _options.SecurityId }, null);
         context.Client.SendMessage(request);
 
         Logger.LogInformation("Отправили запрос на котировки, ожидаем текущее значение котировок..");
