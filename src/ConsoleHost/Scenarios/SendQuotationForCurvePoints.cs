@@ -9,19 +9,19 @@ namespace SoftWell.RtFix.ConsoleHost.Scenarios;
 
 public class SendQuotationForCurvePoints : QuotationScenarioBase
 {
-    private readonly OperationOptions _options;
+    private readonly IOptions<List<OperationOptions>> _options;
 
     public SendQuotationForCurvePoints(
         ScenarioSettings settings,
-        IOptions<OperationOptions> options,
-        ILoggerFactory loggerFactory) : base(settings, loggerFactory)
+        IOptions<List<OperationOptions>> options,
+        ILoggerFactory loggerFactory) : base(settings, options, loggerFactory)
     {
         ArgumentNullException.ThrowIfNull(options);
 
-        if (options.Value.QuotationSecurityId is null) throw new ArgumentException("QuotationSecurityId should be present in configuration");
-
-        _options = options.Value;
+        _options = options;
     }
+
+    protected override OperationOptions ScenarioOptions => _options.Value.Where(x => x.Name == nameof(SendQuotationForCurvePoints)).FirstOrDefault() ?? throw new ArgumentNullException();
 
     public override string Name => nameof(SendQuotationForCurvePoints);
 
@@ -34,11 +34,11 @@ public class SendQuotationForCurvePoints : QuotationScenarioBase
 
         const decimal bid = 7.35m;
         const decimal offer = 8.37m;
-        var request = Helpers.CreateQuote(_options.QuotationSecurityId, bid, offer);
+        var request = Helpers.CreateQuote(ScenarioOptions.QuotationSecurityId, bid, offer);
 
         request.AddGroup(new MarketDataRequest.NoPartyIDsGroup
         {
-            PartyID = new PartyID(_options.CurveCode)
+            PartyID = new PartyID(ScenarioOptions.CurveCode)
         });
 
         context.Client.SendMessage(request);
@@ -56,7 +56,7 @@ public class SendQuotationForCurvePoints : QuotationScenarioBase
                 foreach (var g in EnumerateMDEntriesGroups(mdr))
                 {
                     if (g.MDUpdateAction.getValue() == MDUpdateAction.NEW
-                            && g.SecurityID.getValue() == _options.QuotationSecurityId)
+                            && g.SecurityID.getValue() == ScenarioOptions.QuotationSecurityId)
                     {
                         var type = g.MDEntryType.getValue();
 
@@ -72,7 +72,7 @@ public class SendQuotationForCurvePoints : QuotationScenarioBase
                         var pg = new MarketDataSnapshotFullRefresh.NoMDEntriesGroup.NoPartyIDsGroup();
                         g.GetGroup(1, pg);
 
-                        if (pg.PartyID.getValue() == _options.CurveCode)
+                        if (pg.PartyID.getValue() == ScenarioOptions.CurveCode)
                         {
                             isOurPartyId = true;
                         }

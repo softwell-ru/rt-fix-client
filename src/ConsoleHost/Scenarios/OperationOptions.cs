@@ -2,6 +2,8 @@ namespace SoftWell.RtFix.ConsoleHost.Scenarios;
 
 public class OperationOptions
 {
+    public string Name { get; set; } = null!;
+
     public string? PartyId { get; set; }
 
     public string[]? PartyIds { get; set; }

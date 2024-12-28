@@ -9,19 +9,19 @@ namespace SoftWell.RtFix.ConsoleHost.Scenarios;
 
 public class SendQuotationsRequestReceiveRefreshed : QuotationScenarioBase
 {
-    private readonly OperationOptions _options;
+    private readonly IOptions<List<OperationOptions>> _options;
 
     public SendQuotationsRequestReceiveRefreshed(
         ScenarioSettings settings,
-        IOptions<OperationOptions> options,
-        ILoggerFactory loggerFactory) : base(settings, loggerFactory)
+        IOptions<List<OperationOptions>> options,
+        ILoggerFactory loggerFactory) : base(settings, options, loggerFactory)
     {
         ArgumentNullException.ThrowIfNull(options);
 
-        if (options.Value.QuotationSecurityId is null) throw new ArgumentException("QuotationSecurityId should be present in configuration");
-
-        _options = options.Value;
+        _options = options;
     }
+
+    protected override OperationOptions ScenarioOptions => _options.Value.Where(x => x.Name == nameof(SendQuotationsRequestReceiveRefreshed)).FirstOrDefault() ?? throw new ArgumentNullException();
 
     public override string Name => nameof(SendQuotationsRequestReceiveRefreshed);
 
@@ -29,7 +29,7 @@ public class SendQuotationsRequestReceiveRefreshed : QuotationScenarioBase
 
     protected override async Task RunAsyncInner(ScenarioContext context, CancellationToken ct)
     {
-        var request = Helpers.CreateQuotationRequest(new[] { _options.QuotationSecurityId }, null);
+        var request = Helpers.CreateQuotationRequest(new[] { ScenarioOptions.QuotationSecurityId }, null);
         context.Client.SendMessage(request);
 
         Logger.LogInformation("Отправили запрос на котировки, ожидаем хотя бы одно обновление котировки..");

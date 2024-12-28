@@ -9,19 +9,19 @@ namespace SoftWell.RtFix.ConsoleHost.Scenarios;
 
 public class SendQuotationsRequestReceiveSnapshots : QuotationScenarioBase
 {
-    private readonly OperationOptions _options;
+    private readonly IOptions<List<OperationOptions>> _options;
 
     public SendQuotationsRequestReceiveSnapshots(
         ScenarioSettings settings,
-        IOptions<OperationOptions> options,
-        ILoggerFactory loggerFactory) : base(settings, loggerFactory)
+        IOptions<List<OperationOptions>> options,
+        ILoggerFactory loggerFactory) : base(settings, options, loggerFactory)
     {
         ArgumentNullException.ThrowIfNull(options);
 
-        if (options.Value.SecurityId is null) throw new ArgumentException("SecurityId should be present in configuration");
-
-        _options = options.Value;
+        _options = options;
     }
+
+    protected override OperationOptions ScenarioOptions => _options.Value.Where(x => x.Name == nameof(SendQuotationsRequestReceiveSnapshots)).FirstOrDefault() ?? throw new ArgumentNullException();
 
     public override string Name => nameof(SendQuotationsRequestReceiveSnapshots);
 
@@ -32,7 +32,7 @@ public class SendQuotationsRequestReceiveSnapshots : QuotationScenarioBase
         var count = 0;
         var totalCount = 0;
 
-        var request = Helpers.CreateQuotationRequest(new[] { _options.SecurityId }, null);
+        var request = Helpers.CreateQuotationRequest(new[] { ScenarioOptions.SecurityId }, null);
         context.Client.SendMessage(request);
 
         Logger.LogInformation("Отправили запрос на котировки, ожидаем текущее значение котировок..");

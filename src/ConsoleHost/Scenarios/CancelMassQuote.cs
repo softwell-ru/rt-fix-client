@@ -9,34 +9,35 @@ namespace SoftWell.RtFix.ConsoleHost.Scenarios;
 
 public class CancelMassQuote : QuotationScenarioBase
 {
-    private readonly OperationOptions _options;
+    private readonly IOptions<List<OperationOptions>> _options;
 
     public CancelMassQuote(
         ScenarioSettings settings,
-        IOptions<OperationOptions> options,
-        ILoggerFactory loggerFactory) : base(settings, loggerFactory)
+        IOptions<List<OperationOptions>> options,
+        ILoggerFactory loggerFactory) : base(settings, options, loggerFactory)
     {
         ArgumentNullException.ThrowIfNull(options);
 
-        if (options.Value.QuotationSecurityId is null) throw new ArgumentNullException("QuotationSecurityId should be present in configuration");
-
-        _options = options.Value;
+        _options = options;
     }
+
+    protected override OperationOptions ScenarioOptions => _options.Value.Where(x => x.Name == nameof(CancelMassQuote)).FirstOrDefault() ?? throw new ArgumentNullException();
 
     public override string Name => nameof(CancelMassQuote);
 
     public override string? Description => $"Отменить MassQuote котировку, дождаться сообщения об отмене";
 
+
     protected override async Task RunAsyncInner(ScenarioContext context, CancellationToken ct)
     {
-        var message = Helpers.MassQuoteRequest(_options.QuotationSecurityId, _options.PartyId);
+        var message = Helpers.MassQuoteRequest(ScenarioOptions.QuotationSecurityId, ScenarioOptions.PartyId);
 
-        var cancelBand = Helpers.CreateQuoteCancel(_options.QuotationSecurityId);
+        var cancelBand = Helpers.CreateQuoteCancel(ScenarioOptions.QuotationSecurityId);
         //Указываем, что отменяем торгуемые цены, чтобы отменять банды.
         cancelBand.QuoteType = new QuoteType(QuoteType.TRADEABLE);
         cancelBand.AddGroup(new QuoteCancel.NoPartyIDsGroup
         {
-            PartyID = new PartyID(_options.PartyId)
+            PartyID = new PartyID(ScenarioOptions.PartyId)
         });
 
         context.Client.SendMessage(message);

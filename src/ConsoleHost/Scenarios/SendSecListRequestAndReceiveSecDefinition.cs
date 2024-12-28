@@ -9,19 +9,19 @@ namespace SoftWell.RtFix.ConsoleHost.Scenarios;
 
 public class SendSecListRequestAndReceiveSecDefinition : ScenarioBase
 {
-    private readonly OperationOptions _options;
+    private readonly IOptions<List<OperationOptions>> _options;
 
     public SendSecListRequestAndReceiveSecDefinition(
         ScenarioSettings settings,
-        IOptions<OperationOptions> options,
+        IOptions<List<OperationOptions>> options,
         ILoggerFactory loggerFactory) : base(settings, loggerFactory)
     {
         ArgumentNullException.ThrowIfNull(options);
 
-        if (options.Value.SecurityId is null) throw new ArgumentException("SecurityId should be present in configuration");
-
-        _options = options.Value;
+        _options = options;
     }
+
+    protected OperationOptions ScenarioOptions => _options.Value.Where(x => x.Name == nameof(SendSecListRequestAndReceiveSecDefinition)).FirstOrDefault() ?? throw new ArgumentNullException();
 
     public override string Name => nameof(SendSecListRequestAndReceiveSecDefinition);
 
@@ -29,7 +29,7 @@ public class SendSecListRequestAndReceiveSecDefinition : ScenarioBase
 
     protected override async Task RunAsyncInner(ScenarioContext context, CancellationToken ct)
     {
-        var request = Helpers.CreateSecListSymbolRequest(_options.SecurityId);
+        var request = Helpers.CreateSecListSymbolRequest(ScenarioOptions.SecurityId);
 
         context.Client.SendMessage(request);
 

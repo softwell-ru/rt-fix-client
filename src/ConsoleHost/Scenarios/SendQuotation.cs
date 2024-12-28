@@ -9,19 +9,19 @@ namespace SoftWell.RtFix.ConsoleHost.Scenarios;
 
 public class SendQuotation : QuotationScenarioBase
 {
-    private readonly OperationOptions _options;
+    private readonly IOptions<List<OperationOptions>> _options;
 
     public SendQuotation(
         ScenarioSettings settings,
-        IOptions<OperationOptions> options,
-        ILoggerFactory loggerFactory) : base(settings, loggerFactory)
+        IOptions<List<OperationOptions>> options,
+        ILoggerFactory loggerFactory) : base(settings, options, loggerFactory)
     {
         ArgumentNullException.ThrowIfNull(options);
 
-        if (options.Value.QuotationSecurityId is null) throw new ArgumentException("QuotationSecurityId should be present in configuration");
-
-        _options = options.Value;
+        _options = options;
     }
+
+    protected override OperationOptions ScenarioOptions => _options.Value.Where(x => x.Name == nameof(SendQuotation)).FirstOrDefault() ?? throw new ArgumentNullException();
 
     public override string Name => nameof(SendQuotation);
 
@@ -34,7 +34,7 @@ public class SendQuotation : QuotationScenarioBase
 
         const decimal bid = 61.35m;
         const decimal offer = 64.37m;
-        var request = Helpers.CreateQuote(_options.QuotationSecurityId, bid, offer);
+        var request = Helpers.CreateQuote(ScenarioOptions.QuotationSecurityId, bid, offer);
 
         context.Client.SendMessage(request);
 
@@ -50,7 +50,7 @@ public class SendQuotation : QuotationScenarioBase
                 foreach (var g in EnumerateMDEntriesGroups(mdr))
                 {
                     if (g.MDUpdateAction.getValue() == MDUpdateAction.NEW
-                            && g.SecurityID.getValue() == _options.QuotationSecurityId)
+                            && g.SecurityID.getValue() == ScenarioOptions.QuotationSecurityId)
                     {
                         var type = g.MDEntryType.getValue();
 

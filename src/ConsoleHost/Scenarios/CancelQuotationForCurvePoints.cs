@@ -9,19 +9,19 @@ namespace SoftWell.RtFix.ConsoleHost.Scenarios;
 
 public class CancelQuotationForCurvePoints : QuotationScenarioBase
 {
-    private readonly OperationOptions _options;
+    private readonly IOptions<List<OperationOptions>> _options;
 
     public CancelQuotationForCurvePoints(
         ScenarioSettings settings,
-        IOptions<OperationOptions> options,
-        ILoggerFactory loggerFactory) : base(settings, loggerFactory)
+        IOptions<List<OperationOptions>> options,
+        ILoggerFactory loggerFactory) : base(settings, options, loggerFactory)
     {
         ArgumentNullException.ThrowIfNull(options);
 
-        if (options.Value.QuotationSecurityId is null) throw new ArgumentException("QuotationSecurityId should be present in configuration");
-
-        _options = options.Value;
+        _options = options;
     }
+
+    protected override OperationOptions ScenarioOptions => _options.Value.Where(x => x.Name == nameof(CancelQuotationForCurvePoints)).FirstOrDefault() ?? throw new ArgumentNullException();
 
     public override string Name => nameof(CancelQuotationForCurvePoints);
 
@@ -32,22 +32,22 @@ public class CancelQuotationForCurvePoints : QuotationScenarioBase
         SubscribeToRefreshes(context);
         await WaitForSnapshotFullRefreshAsync(context, ct);
 
-        var valuesRequest = Helpers.CreateQuote(_options.QuotationSecurityId, 7.37m, 8.74m);
+        var valuesRequest = Helpers.CreateQuote(ScenarioOptions.QuotationSecurityId, 7.37m, 8.74m);
 
         valuesRequest.AddGroup(new MarketDataRequest.NoPartyIDsGroup
         {
-            PartyID = new PartyID(_options.CurveCode)
+            PartyID = new PartyID(ScenarioOptions.CurveCode)
         });
 
         context.Client.SendMessage(valuesRequest);
 
         Logger.LogInformation("Отправили котировку с какими-то значениями, чтобы было, что удалять");
 
-        var request = Helpers.CreateQuoteCancel(_options.QuotationSecurityId);
+        var request = Helpers.CreateQuoteCancel(ScenarioOptions.QuotationSecurityId);
 
         request.AddGroup(new MarketDataRequest.NoPartyIDsGroup
         {
-            PartyID = new PartyID(_options.CurveCode)
+            PartyID = new PartyID(ScenarioOptions.CurveCode)
         });
         context.Client.SendMessage(request);
 
@@ -64,7 +64,7 @@ public class CancelQuotationForCurvePoints : QuotationScenarioBase
                 foreach (var g in EnumerateMDEntriesGroups(mdir))
                 {
                     if (g.MDUpdateAction.getValue() == MDUpdateAction.DELETE
-                        && g.SecurityID.getValue() == _options.QuotationSecurityId)
+                        && g.SecurityID.getValue() == ScenarioOptions.QuotationSecurityId)
                     {
                         var type = g.MDEntryType.getValue();
 
@@ -80,7 +80,7 @@ public class CancelQuotationForCurvePoints : QuotationScenarioBase
                         var pg = new MarketDataSnapshotFullRefresh.NoMDEntriesGroup.NoPartyIDsGroup();
                         g.GetGroup(1, pg);
 
-                        if (pg.PartyID.getValue() == _options.CurveCode)
+                        if (pg.PartyID.getValue() == ScenarioOptions.CurveCode)
                         {
                             isOurPartyId = true;
                         }
