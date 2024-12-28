@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using QuickFix;
 using QuickFix.Fields;
 using QuickFix.FIX50SP2;
@@ -8,11 +9,19 @@ namespace SoftWell.RtFix.ConsoleHost.Scenarios;
 
 public class SendQuotationsRequestReceiveSnapshots : QuotationScenarioBase
 {
+    private readonly IOptions<List<OperationOptions>> _options;
+
     public SendQuotationsRequestReceiveSnapshots(
         ScenarioSettings settings,
-        ILoggerFactory loggerFactory) : base(settings, loggerFactory)
+        IOptions<List<OperationOptions>> options,
+        ILoggerFactory loggerFactory) : base(settings, options, loggerFactory)
     {
+        ArgumentNullException.ThrowIfNull(options);
+
+        _options = options;
     }
+
+    protected override OperationOptions ScenarioOptions => _options.Value.Where(x => x.Name == nameof(SendQuotationsRequestReceiveSnapshots)).FirstOrDefault() ?? throw new ArgumentNullException();
 
     public override string Name => nameof(SendQuotationsRequestReceiveSnapshots);
 
@@ -23,7 +32,7 @@ public class SendQuotationsRequestReceiveSnapshots : QuotationScenarioBase
         var count = 0;
         var totalCount = 0;
 
-        var request = Helpers.CreateQuotationRequest(new[] { "FX-USD-RUB-TOM" }, null);
+        var request = Helpers.CreateQuotationRequest(new[] { ScenarioOptions.SecurityId }, null);
         context.Client.SendMessage(request);
 
         Logger.LogInformation("Отправили запрос на котировки, ожидаем текущее значение котировок..");

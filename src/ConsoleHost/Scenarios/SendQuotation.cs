@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using QuickFix;
 using QuickFix.Fields;
 using QuickFix.FIX50SP2;
@@ -8,11 +9,19 @@ namespace SoftWell.RtFix.ConsoleHost.Scenarios;
 
 public class SendQuotation : QuotationScenarioBase
 {
+    private readonly IOptions<List<OperationOptions>> _options;
+
     public SendQuotation(
         ScenarioSettings settings,
-        ILoggerFactory loggerFactory) : base(settings, loggerFactory)
+        IOptions<List<OperationOptions>> options,
+        ILoggerFactory loggerFactory) : base(settings, options, loggerFactory)
     {
+        ArgumentNullException.ThrowIfNull(options);
+
+        _options = options;
     }
+
+    protected override OperationOptions ScenarioOptions => _options.Value.Where(x => x.Name == nameof(SendQuotation)).FirstOrDefault() ?? throw new ArgumentNullException();
 
     public override string Name => nameof(SendQuotation);
 
@@ -25,7 +34,7 @@ public class SendQuotation : QuotationScenarioBase
 
         const decimal bid = 61.35m;
         const decimal offer = 64.37m;
-        var request = Helpers.CreateQuote(QuotationSecurityId, bid, offer);
+        var request = Helpers.CreateQuote(ScenarioOptions.QuotationSecurityId, bid, offer);
 
         context.Client.SendMessage(request);
 
@@ -41,7 +50,7 @@ public class SendQuotation : QuotationScenarioBase
                 foreach (var g in EnumerateMDEntriesGroups(mdr))
                 {
                     if (g.MDUpdateAction.getValue() == MDUpdateAction.NEW
-                            && g.SecurityID.getValue() == QuotationSecurityId)
+                            && g.SecurityID.getValue() == ScenarioOptions.QuotationSecurityId)
                     {
                         var type = g.MDEntryType.getValue();
 

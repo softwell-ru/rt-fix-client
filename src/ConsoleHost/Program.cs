@@ -37,10 +37,11 @@ var builder = Host.CreateDefaultBuilder()
                 })
             .SetMinimumLevel(LogLevel.Debug));
 
-        services.AddOptions<SendQuotationsBatchRequestReceiveRefreshedIndefinitelyOptions>()
-            .Bind(host.Configuration.GetSection(nameof(SendQuotationsBatchRequestReceiveRefreshedIndefinitely)));
+        services.AddOptions<List<OperationOptions>>()
+            .Bind(host.Configuration.GetSection("Scenarios"));
 
         services.AddSingleton(scenarioSettings);
+
         AddScenario<SendQuotationsRequestReceiveSnapshots>(services);
         AddScenario<SendQuotationsRequestReceiveRefreshed>(services);
         AddScenario<ReceiveDeal>(services);

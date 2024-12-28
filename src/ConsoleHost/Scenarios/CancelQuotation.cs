@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using QuickFix;
 using QuickFix.Fields;
 using QuickFix.FIX50SP2;
@@ -8,10 +9,14 @@ namespace SoftWell.RtFix.ConsoleHost.Scenarios;
 
 public class CancelQuotation : QuotationScenarioBase
 {
+    private readonly IOptions<List<OperationOptions>> _options;
+
     public CancelQuotation(
         ScenarioSettings settings,
-        ILoggerFactory loggerFactory) : base(settings, loggerFactory)
+        IOptions<List<OperationOptions>> options,
+        ILoggerFactory loggerFactory) : base(settings, options, loggerFactory)
     {
+        _options = options;
     }
 
     public override string Name => nameof(CancelQuotation);
@@ -23,12 +28,12 @@ public class CancelQuotation : QuotationScenarioBase
         SubscribeToRefreshes(context);
         await WaitForSnapshotFullRefreshAsync(context, ct);
 
-        var valuesRequest = Helpers.CreateQuote(QuotationSecurityId, 62.37m, 63.74m);
+        var valuesRequest = Helpers.CreateQuote(ScenarioOptions.QuotationSecurityId, 62.37m, 63.74m);
         context.Client.SendMessage(valuesRequest);
 
         Logger.LogInformation("Отправили котировку с какими-то значениями, чтобы было, что удалять");
 
-        var request = Helpers.CreateQuoteCancel(QuotationSecurityId);
+        var request = Helpers.CreateQuoteCancel(ScenarioOptions.QuotationSecurityId);
         context.Client.SendMessage(request);
 
         Logger.LogInformation("Отправили отмену котировки, ожидаем сообщение об отмене..");
@@ -43,7 +48,7 @@ public class CancelQuotation : QuotationScenarioBase
                 foreach (var g in EnumerateMDEntriesGroups(mdir))
                 {
                     if (g.MDUpdateAction.getValue() == MDUpdateAction.DELETE
-                        && g.SecurityID.getValue() == QuotationSecurityId)
+                        && g.SecurityID.getValue() == ScenarioOptions.QuotationSecurityId)
                     {
                         var type = g.MDEntryType.getValue();
 
