@@ -27,7 +27,6 @@ public class CancelMassQuote : QuotationScenarioBase
 
     public override string? Description => $"Отменить MassQuote котировку, дождаться сообщения об отмене";
 
-
     protected override async Task RunAsyncInner(ScenarioContext context, CancellationToken ct)
     {
         var message = Helpers.MassQuoteRequest(ScenarioOptions.QuotationSecurityId, ScenarioOptions.PartyId);

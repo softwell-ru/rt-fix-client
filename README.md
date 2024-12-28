@@ -38,19 +38,19 @@ dotnet run [arguments]
 
 #### SendQuotationsRequestReceiveRefreshed
 
-Отправить запрос на котировки, получить обновление. Требует в appsettings.json заполненный параметр QuotationSecurityId.
+Отправить запрос на котировки, получить обновление. Требует в appsettings.json секцию SendQuotationsRequestReceiveRefreshed с параметром QuotationSecurityId
 
 #### SendQuotationsRequestReceiveSnapshots
 
-Отправить запрос на котировки, получить текущие значения. Требует в appsettings.json заполненный параметр SecurityId.
+Отправить запрос на котировки, получить текущие значения. Требует в appsettings.json секцию SendQuotationsRequestReceiveSnapshots с параметром SecurityId
 
 #### SendQuotationsBatchRequestReceiveRefreshedIndefinitely
 
-Отправить запрос на батч котировки, получать обновления бесконечно и выписывать среднее количество поступивших обновлений и цен в них в секунду. Требует в appsettings.json список инструментов(SecurityIds) и, опционально, контрагентов(PartyIds).
+Отправить запрос на батч котировки, получать обновления бесконечно и выписывать среднее количество поступивших обновлений и цен в них в секунду. Требует в appsettings.json секцию SendQuotationsBatchRequestReceiveRefreshedIndefinitely со списком инструментов(SecurityIds) и, опционально, контрагентов(PartyIds)
 
 #### SendQuotation
 
-Отправить котировку, дождаться сообщения с измененными ценами. Требует в appsettings.json заполненный параметр QuotationSecurityId.
+Отправить котировку, дождаться сообщения с измененными ценами. Требует в appsettings.json секцию SendQuotation с параметром QuotationSecurityId
 
 #### CancelQuotation
 
@@ -70,4 +70,25 @@ dotnet run [arguments]
 
 #### SendSecListRequestAndReceiveSecDefinition
 
-Отправить запрос на данные по инструменту, получить подтверждение запроса, получить данные. Требует указанный в appsettings.json инструмент(SecurityId)
+Отправить запрос на данные по инструменту, получить подтверждение запроса, получить данные. ТТребует в appsettings.json секцию SendSecListRequestAndReceiveSecDefinition с параметром SecurityId
+
+### CancelMassQuote
+
+Требует в appsettings.json секцию CancelMassQuote с параметрами QuotationSecurityId и PartyId
+
+### CancelQuotationForCurvePoints
+
+Требует в appsettings.json секцию CancelQuotationForCurvePoints с параметрами QuotationSecurityId и CurveCode
+
+### SendMassQuoteWithoutParty
+
+Требует в appsettings.json секцию SendMassQuoteWithoutParty с параметром QuotationSecurityId
+
+### SendMassQuoteWithParty
+
+Требует в appsettings.json секцию SendMassQuoteWithParty с параметрами QuotationSecurityId и PartyId
+
+### SendQuotationForCurvePoints
+
+Требует в appsettings.json секцию CancelQuotationForCurvePoints с параметрами QuotationSecurityId и CurveCode
+
