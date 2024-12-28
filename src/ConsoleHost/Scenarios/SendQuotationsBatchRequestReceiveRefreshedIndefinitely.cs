@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using QuickFix;
 using QuickFix.Fields;
 using QuickFix.FIX50SP2;
 using SoftWell.RtFix.ConsoleHost.Scenarios.Infrastructure;
