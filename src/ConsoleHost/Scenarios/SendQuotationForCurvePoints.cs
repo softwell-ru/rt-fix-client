@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using QuickFix;
 using QuickFix.Fields;
 using QuickFix.FIX50SP2;
@@ -12,16 +13,16 @@ public class SendQuotationForCurvePoints : QuotationScenarioBase
 
     public SendQuotationForCurvePoints(
         ScenarioSettings settings,
-        ConfigManager configManager,
+        IOptions<OperationOptions> options,
         ILoggerFactory loggerFactory) : base(settings, loggerFactory)
     {
-        ArgumentNullException.ThrowIfNull(configManager);
+        ArgumentNullException.ThrowIfNull(options);
 
-        _options = configManager.GetOperationSettings("SendQuotationForCurvePoints")
-                   ?? throw new InvalidOperationException("SendQuotationForCurvePoints settings are not configured.");
+        if (options.Value.QuotationSecurityId is null) throw new ArgumentException("QuotationSecurityId should be present in configuration");
 
-        if (_options.QuotationSecurityId is null) throw new ArgumentException("QuotationSecurityId should be present in configuration");
+        _options = options.Value;
     }
+
     public override string Name => nameof(SendQuotationForCurvePoints);
 
     public override string? Description => $"Отправить котировку c кодом кривой, дождаться сообщения с измененными ценами";

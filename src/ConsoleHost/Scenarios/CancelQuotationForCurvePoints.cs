@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using QuickFix;
 using QuickFix.Fields;
 using QuickFix.FIX50SP2;
@@ -12,15 +13,14 @@ public class CancelQuotationForCurvePoints : QuotationScenarioBase
 
     public CancelQuotationForCurvePoints(
         ScenarioSettings settings,
-        ConfigManager configManager,
+        IOptions<OperationOptions> options,
         ILoggerFactory loggerFactory) : base(settings, loggerFactory)
     {
-        ArgumentNullException.ThrowIfNull(configManager);
+        ArgumentNullException.ThrowIfNull(options);
 
-        _options = configManager.GetOperationSettings("SendQuotationForCurvePoints")
-                   ?? throw new ArgumentException("SendQuotationForCurvePoints settings are not configured.");
+        if (options.Value.QuotationSecurityId is null) throw new ArgumentException("QuotationSecurityId should be present in configuration");
 
-        if (_options.QuotationSecurityId is null) throw new ArgumentException("QuotationSecurityId should be present in configuration");
+        _options = options.Value;
     }
 
     public override string Name => nameof(CancelQuotationForCurvePoints);
@@ -43,7 +43,7 @@ public class CancelQuotationForCurvePoints : QuotationScenarioBase
 
         Logger.LogInformation("Отправили котировку с какими-то значениями, чтобы было, что удалять");
 
-        var request = Helpers.CreateQuoteCancel(QuotationSecurityId);
+        var request = Helpers.CreateQuoteCancel(_options.QuotationSecurityId);
 
         request.AddGroup(new MarketDataRequest.NoPartyIDsGroup
         {

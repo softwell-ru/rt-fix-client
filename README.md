@@ -38,19 +38,19 @@ dotnet run [arguments]
 
 #### SendQuotationsRequestReceiveRefreshed
 
-Отправить запрос на котировки, получить обновление
+Отправить запрос на котировки, получить обновление. Требует в appsettings.json заполненный параметр QuotationSecurityId.
 
 #### SendQuotationsRequestReceiveSnapshots
 
-Отправить запрос на котировки, получить текущие значения
+Отправить запрос на котировки, получить текущие значения. Требует в appsettings.json заполненный параметр SecurityId.
 
 #### SendQuotationsBatchRequestReceiveRefreshedIndefinitely
 
-Отправить запрос на батч котировки, получать обновления бесконечно и выписывать среднее количество поступивших обновлений и цен в них в секунду. Требует в appsettings.json секцию SendQuotationsBatchRequestReceiveRefreshedIndefinitely со списком инструментов и, опционально, контрагентов.
+Отправить запрос на батч котировки, получать обновления бесконечно и выписывать среднее количество поступивших обновлений и цен в них в секунду. Требует в appsettings.json список инструментов(SecurityIds) и, опционально, контрагентов(PartyIds).
 
 #### SendQuotation
 
-Отправить котировку, дождаться сообщения с измененными ценами
+Отправить котировку, дождаться сообщения с измененными ценами. Требует в appsettings.json заполненный параметр QuotationSecurityId.
 
 #### CancelQuotation
 
@@ -70,4 +70,4 @@ dotnet run [arguments]
 
 #### SendSecListRequestAndReceiveSecDefinition
 
-Отправить запрос на данные по инструменту, получить подтверждение запроса, получить данные
+Отправить запрос на данные по инструменту, получить подтверждение запроса, получить данные. Требует указанный в appsettings.json инструмент(SecurityId)

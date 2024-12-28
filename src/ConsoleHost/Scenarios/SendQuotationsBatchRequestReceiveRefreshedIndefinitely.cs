@@ -21,15 +21,15 @@ public class SendQuotationsBatchRequestReceiveRefreshedIndefinitely : QuotationS
 
     public SendQuotationsBatchRequestReceiveRefreshedIndefinitely(
          ScenarioSettings settings,
-         ConfigManager configManager,
+         IOptions<OperationOptions> options,
          ILoggerFactory loggerFactory) : base(settings, loggerFactory)
     {
-        ArgumentNullException.ThrowIfNull(configManager);
+        ArgumentNullException.ThrowIfNull(options);
 
-        _options = configManager.GetOperationSettings("SendQuotationsBatchRequestReceiveRefreshedIndefinitely")
-                   ?? throw new InvalidOperationException("SendQuotationsBatchRequestReceiveRefreshedIndefinitely settings are not configured.");
+        if (options.Value is null) throw new ArgumentException("Scenario options should be present in configuration");
+        if (options.Value.SecurityIds?.Any() != true) throw new ArgumentException("SecurityIds should be present in scenario options");
 
-        if (_options.SecurityIds?.Any() != true) throw new ArgumentException("SecurityIds should be present in scenario options");
+        _options = options.Value;
     }
 
     public override string Name => nameof(SendQuotationsBatchRequestReceiveRefreshedIndefinitely);

@@ -37,35 +37,11 @@ var builder = Host.CreateDefaultBuilder()
                 })
             .SetMinimumLevel(LogLevel.Debug));
 
-        var operationNames = new[]
-               {
-            "SendQuotationForCurvePoints",
-            "CancelMassQuote",
-            "SendMassQuoteWithoutParty",
-            "SendMassQuoteWithParty",
-            "SendQuotationsBatchRequestReceiveRefreshedIndefinitely",
-            "SendSecListRequestAndReceiveSecDefinition"
-        };
-
-        foreach (var operationName in operationNames)
-        {
-            services.AddOptions<OperationOptions>(operationName)
-                .Configure<IConfiguration>((settings, configuration) =>
-                {
-                    var settingsManager = new ConfigManager(configuration);
-                    var operationSettings = settingsManager.GetOperationSettings(operationName);
-
-                    settings.PartyId = operationSettings.PartyId;
-                    settings.QuotationSecurityId = operationSettings.QuotationSecurityId;
-                    settings.CurveCode = operationSettings.CurveCode;
-                    settings.SecurityIds = operationSettings.SecurityIds;
-                    settings.Interval = operationSettings.Interval;
-                });
-        }
+        services.AddOptions<OperationOptions>()
+            .Bind(host.Configuration.GetSection("CommonSettings"));
 
         services.AddSingleton(scenarioSettings);
 
-        services.AddSingleton<ConfigManager>();
         AddScenario<SendQuotationsRequestReceiveSnapshots>(services);
         AddScenario<SendQuotationsRequestReceiveRefreshed>(services);
         AddScenario<ReceiveDeal>(services);

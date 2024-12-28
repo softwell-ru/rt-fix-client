@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using QuickFix;
 using QuickFix.Fields;
 using QuickFix.FIX50SP2;
@@ -12,15 +13,14 @@ public class SendMassQuoteWithParty : QuotationScenarioBase
 
     public SendMassQuoteWithParty(
         ScenarioSettings settings,
-        ConfigManager configManager,
+        IOptions<OperationOptions> options,
         ILoggerFactory loggerFactory) : base(settings, loggerFactory)
     {
-        ArgumentNullException.ThrowIfNull(configManager);
+        ArgumentNullException.ThrowIfNull(options);
 
-        _options = configManager.GetOperationSettings("CommonSettings")
-                   ?? throw new InvalidOperationException("Common settings are not configured.");
+        if (options.Value.QuotationSecurityId is null) throw new ArgumentException("QuotationSecurityId should be present in configuration");
 
-        if (_options.QuotationSecurityId is null) throw new ArgumentException("QuotationSecurityId should be present in configuration");
+        _options = options.Value;
     }
 
     public override string Name => nameof(SendMassQuoteWithParty);

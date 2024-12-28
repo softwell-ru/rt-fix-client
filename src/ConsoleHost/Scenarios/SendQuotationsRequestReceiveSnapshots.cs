@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using QuickFix;
 using QuickFix.Fields;
 using QuickFix.FIX50SP2;
@@ -12,15 +13,14 @@ public class SendQuotationsRequestReceiveSnapshots : QuotationScenarioBase
 
     public SendQuotationsRequestReceiveSnapshots(
         ScenarioSettings settings,
-        ConfigManager configManager,
+        IOptions<OperationOptions> options,
         ILoggerFactory loggerFactory) : base(settings, loggerFactory)
     {
-        ArgumentNullException.ThrowIfNull(configManager);
+        ArgumentNullException.ThrowIfNull(options);
 
-        _options = configManager.GetOperationSettings("CommonSettings")
-            ?? throw new InvalidOperationException("CommonSettings settings are not configured.");
+        if (options.Value.SecurityId is null) throw new ArgumentException("SecurityId should be present in configuration");
 
-        if (_options.SecurityId is null) throw new ArgumentException("SecurityId should be present in configuration");
+        _options = options.Value;
     }
 
     public override string Name => nameof(SendQuotationsRequestReceiveSnapshots);
