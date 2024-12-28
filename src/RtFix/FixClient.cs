@@ -44,7 +44,7 @@ public class FixClient : IApplication, IAsyncDisposable
 
     public void OnCreate(SessionID sessionID)
     {
-        _session = Session.LookupSession(sessionID);
+        _session = Session.LookupSession(sessionID) ?? throw new ArgumentException("Unknown session id", nameof(sessionID));
         _logger.LogTrace("Создана сессия: {session}", sessionID);
     }
 

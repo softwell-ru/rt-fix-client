@@ -3,16 +3,15 @@
   <Import Project="..\AssemblyInfo.props" />
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyName>SoftWell.RtFix</AssemblyName>
     <RootNamespace>SoftWell.RtFix</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="QuickFIXn.Core" Version="1.10.0" />
-    <PackageReference Include="QuickFIXn.FIX5.0SP2" Version="1.10.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0" />
+    <PackageReference Include="SoftWell.Fix" Version="7.4.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.1" />
   </ItemGroup>
 
 </Project>

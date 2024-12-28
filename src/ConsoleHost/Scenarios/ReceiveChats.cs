@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging;
+using QuickFix;
 using QuickFix.Fields;
-using QuickFix.FIX50SP2;
 using SoftWell.RtFix.ConsoleHost.Scenarios.Infrastructure;
 
 namespace SoftWell.RtFix.ConsoleHost.Scenarios;
