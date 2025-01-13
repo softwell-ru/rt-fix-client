@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using QuickFix;
 using QuickFix.Fields;
 using QuickFix.FIX50SP2;
@@ -8,21 +9,27 @@ namespace SoftWell.RtFix.ConsoleHost.Scenarios;
 
 public class SendMassQuoteWithoutParty : QuotationScenarioBase
 {
+    private readonly IOptions<List<OperationOptions>> _options;
+
     public SendMassQuoteWithoutParty(
         ScenarioSettings settings,
-        ILoggerFactory loggerFactory) : base(settings, loggerFactory)
+        IOptions<List<OperationOptions>> options,
+        ILoggerFactory loggerFactory) : base(settings, options, loggerFactory)
     {
+        ArgumentNullException.ThrowIfNull(options);
+
+        _options = options;
     }
+
+    protected override OperationOptions ScenarioOptions => _options.Value.Where(x => x.Name == nameof(SendMassQuoteWithoutParty)).FirstOrDefault() ?? throw new ArgumentNullException();
 
     public override string Name => nameof(SendMassQuoteWithoutParty);
 
     public override string? Description => $"Отправить MassQuote без кода режима торгов";
 
-    protected override string QuotationSecurityId => "RUB1WD=";
-
     protected override async Task RunAsyncInner(ScenarioContext context, CancellationToken ct)
     {
-        var request = Helpers.MassQuoteRequest(QuotationSecurityId, null);
+        var request = Helpers.MassQuoteRequest(ScenarioOptions.QuotationSecurityId, null);
 
         context.Client.SendMessage(request);
 

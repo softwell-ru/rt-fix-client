@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using QuickFix.Fields;
 using QuickFix.FIX50SP2;
 using SoftWell.RtFix.ConsoleHost.Scenarios.Infrastructure;
@@ -7,15 +8,18 @@ namespace SoftWell.RtFix.ConsoleHost.Scenarios;
 
 public abstract class QuotationScenarioBase : ScenarioBase
 {
-    protected QuotationScenarioBase(ScenarioSettings settings, ILoggerFactory loggerFactory) : base(settings, loggerFactory)
+    private readonly IOptions<List<OperationOptions>> _options;
+
+    protected QuotationScenarioBase(ScenarioSettings settings, IOptions<List<OperationOptions>> options, ILoggerFactory loggerFactory) : base(settings, loggerFactory)
     {
+        _options = options;
     }
 
-    protected virtual string QuotationSecurityId => "FX-USD-RUB-TOM";
+    protected virtual OperationOptions ScenarioOptions => _options.Value.Where(x => x.Name == "CommonSettings").FirstOrDefault() ?? throw new ArgumentNullException();
 
     protected void SubscribeToRefreshes(ScenarioContext context)
     {
-        SubscribeToRefreshes(context, QuotationSecurityId);
+        SubscribeToRefreshes(context, ScenarioOptions.QuotationSecurityId);
     }
 
     protected void SubscribeToRefreshes(ScenarioContext context, string quotationSecurityId)
@@ -31,9 +35,9 @@ public abstract class QuotationScenarioBase : ScenarioBase
         {
             var mes = await WaitForMessageAsync(context, MsgType.MARKET_DATA_SNAPSHOT_FULL_REFRESH, ct);
             var mdr = (MarketDataSnapshotFullRefresh)mes;
-            if (mdr.SecurityID.getValue() == QuotationSecurityId)
+            if (mdr.SecurityID.getValue() == ScenarioOptions.QuotationSecurityId)
             {
-                Logger.LogInformation("Получили MARKET_DATA_SNAPSHOT_FULL_REFRESH для {securityId}..", QuotationSecurityId);
+                Logger.LogInformation("Получили MARKET_DATA_SNAPSHOT_FULL_REFRESH для {securityId}..", ScenarioOptions.QuotationSecurityId);
                 return mdr;
             }
         }
