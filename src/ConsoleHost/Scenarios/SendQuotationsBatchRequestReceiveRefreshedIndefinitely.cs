@@ -11,7 +11,7 @@ namespace SoftWell.RtFix.ConsoleHost.Scenarios;
 
 public class SendQuotationsBatchRequestReceiveRefreshedIndefinitely : QuotationScenarioBase
 {
-    private readonly SendQuotationsBatchRequestReceiveRefreshedIndefinitelyOptions _options;
+    private readonly IOptions<List<OperationOptions>> _options;
 
     private readonly ConcurrentQueue<TimeSpan> _latencies = new();
 
@@ -20,17 +20,16 @@ public class SendQuotationsBatchRequestReceiveRefreshedIndefinitely : QuotationS
     private long _totalRefreshPricesReceived = 0;
 
     public SendQuotationsBatchRequestReceiveRefreshedIndefinitely(
-        ScenarioSettings settings,
-        IOptions<SendQuotationsBatchRequestReceiveRefreshedIndefinitelyOptions> options,
-        ILoggerFactory loggerFactory) : base(settings, loggerFactory)
+         ScenarioSettings settings,
+         IOptions<List<OperationOptions>> options,
+         ILoggerFactory loggerFactory) : base(settings, options, loggerFactory)
     {
         ArgumentNullException.ThrowIfNull(options);
 
-        if (options.Value is null) throw new ArgumentException("Scenario options should be present in configuration");
-        if (options.Value.SecurityIds?.Any() != true) throw new ArgumentException("SecurityIds should be present in scenario options");
-
-        _options = options.Value;
+        _options = options;
     }
+
+    protected override OperationOptions ScenarioOptions => _options.Value.Where(x => x.Name == nameof(SendQuotationsBatchRequestReceiveRefreshedIndefinitely)).FirstOrDefault() ?? throw new ArgumentNullException();
 
     public override string Name => nameof(SendQuotationsBatchRequestReceiveRefreshedIndefinitely);
 
@@ -38,7 +37,7 @@ public class SendQuotationsBatchRequestReceiveRefreshedIndefinitely : QuotationS
 
     protected override async Task RunAsyncInner(ScenarioContext context, CancellationToken ct)
     {
-        var request = Helpers.CreateQuotationRequest(_options.SecurityIds, _options.PartyIds);
+        var request = Helpers.CreateQuotationRequest(ScenarioOptions.SecurityIds, ScenarioOptions.PartyIds);
         context.Client.SendMessage(request);
 
         Logger.LogInformation("Отправили запрос на котировки");
@@ -119,7 +118,7 @@ public class SendQuotationsBatchRequestReceiveRefreshedIndefinitely : QuotationS
 
         while (!ct.IsCancellationRequested)
         {
-            await Task.Delay(_options.Interval, ct);
+            await Task.Delay(ScenarioOptions.Interval, ct);
 
             var secs = sw.Elapsed.TotalSeconds;
 

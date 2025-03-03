@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using QuickFix;
 using QuickFix.Fields;
 using QuickFix.FIX50SP2;
@@ -8,13 +9,19 @@ namespace SoftWell.RtFix.ConsoleHost.Scenarios;
 
 public class SendSecListRequestAndReceiveSecDefinition : ScenarioBase
 {
-    private readonly string _securityId = "FX-USD-RUB-TOM";
+    private readonly IOptions<List<OperationOptions>> _options;
 
     public SendSecListRequestAndReceiveSecDefinition(
         ScenarioSettings settings,
+        IOptions<List<OperationOptions>> options,
         ILoggerFactory loggerFactory) : base(settings, loggerFactory)
     {
+        ArgumentNullException.ThrowIfNull(options);
+
+        _options = options;
     }
+
+    protected OperationOptions ScenarioOptions => _options.Value.Where(x => x.Name == nameof(SendSecListRequestAndReceiveSecDefinition)).FirstOrDefault() ?? throw new ArgumentNullException();
 
     public override string Name => nameof(SendSecListRequestAndReceiveSecDefinition);
 
@@ -22,7 +29,7 @@ public class SendSecListRequestAndReceiveSecDefinition : ScenarioBase
 
     protected override async Task RunAsyncInner(ScenarioContext context, CancellationToken ct)
     {
-        var request = Helpers.CreateSecListSymbolRequest(_securityId);
+        var request = Helpers.CreateSecListSymbolRequest(ScenarioOptions.SecurityId);
 
         context.Client.SendMessage(request);
 

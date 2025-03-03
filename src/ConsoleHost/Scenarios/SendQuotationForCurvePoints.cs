@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using QuickFix;
 using QuickFix.Fields;
 using QuickFix.FIX50SP2;
@@ -8,16 +9,21 @@ namespace SoftWell.RtFix.ConsoleHost.Scenarios;
 
 public class SendQuotationForCurvePoints : QuotationScenarioBase
 {
-    private static string _curveCode = "SOFTWELL-RUB-ADMIN-380";
+    private readonly IOptions<List<OperationOptions>> _options;
+
     public SendQuotationForCurvePoints(
         ScenarioSettings settings,
-        ILoggerFactory loggerFactory) : base(settings, loggerFactory)
+        IOptions<List<OperationOptions>> options,
+        ILoggerFactory loggerFactory) : base(settings, options, loggerFactory)
     {
+        ArgumentNullException.ThrowIfNull(options);
+
+        _options = options;
     }
 
-    public override string Name => nameof(SendQuotationForCurvePoints);
+    protected override OperationOptions ScenarioOptions => _options.Value.Where(x => x.Name == nameof(SendQuotationForCurvePoints)).FirstOrDefault() ?? throw new ArgumentNullException();
 
-    protected override string QuotationSecurityId => "RUB1WD=";
+    public override string Name => nameof(SendQuotationForCurvePoints);
 
     public override string? Description => $"Отправить котировку c кодом кривой, дождаться сообщения с измененными ценами";
 
@@ -28,11 +34,11 @@ public class SendQuotationForCurvePoints : QuotationScenarioBase
 
         const decimal bid = 7.35m;
         const decimal offer = 8.37m;
-        var request = Helpers.CreateQuote(QuotationSecurityId, bid, offer);
+        var request = Helpers.CreateQuote(ScenarioOptions.QuotationSecurityId, bid, offer);
 
         request.AddGroup(new MarketDataRequest.NoPartyIDsGroup
         {
-            PartyID = new PartyID(_curveCode)
+            PartyID = new PartyID(ScenarioOptions.CurveCode)
         });
 
         context.Client.SendMessage(request);
@@ -50,7 +56,7 @@ public class SendQuotationForCurvePoints : QuotationScenarioBase
                 foreach (var g in EnumerateMDEntriesGroups(mdr))
                 {
                     if (g.MDUpdateAction.getValue() == MDUpdateAction.NEW
-                            && g.SecurityID.getValue() == QuotationSecurityId)
+                            && g.SecurityID.getValue() == ScenarioOptions.QuotationSecurityId)
                     {
                         var type = g.MDEntryType.getValue();
 
@@ -66,7 +72,7 @@ public class SendQuotationForCurvePoints : QuotationScenarioBase
                         var pg = new MarketDataSnapshotFullRefresh.NoMDEntriesGroup.NoPartyIDsGroup();
                         g.GetGroup(1, pg);
 
-                        if (pg.PartyID.getValue() == _curveCode)
+                        if (pg.PartyID.getValue() == ScenarioOptions.CurveCode)
                         {
                             isOurPartyId = true;
                         }
